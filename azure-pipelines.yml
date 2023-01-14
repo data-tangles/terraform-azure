@@ -166,7 +166,7 @@ stages:
   dependsOn: []
   displayName: Prod Environment Windows VM
 
-  job:
+  jobs:
     - job: 'TerraformInit_WindowsVM'
       displayName: 'Initialize Terraform for Prod Environment Windows VM'
       pool: Self-Hosted
