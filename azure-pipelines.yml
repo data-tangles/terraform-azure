@@ -8,8 +8,8 @@ stages:
   displayName: Dev Environment Networking
 
   jobs:
-    - job: 'TerraformInit_Networking'
-      displayName: 'Initialize Terraform for Dev Environment Networking'
+    - job: 'TerraformInitPlan_Networking'
+      displayName: 'Initialize and Plan Terraform for Dev Environment Networking'
       pool: Self-Hosted
       
       steps:
@@ -24,12 +24,6 @@ stages:
             backendAzureRmContainerName: 'dev-tfstate'
             backendAzureRmKey: 'dev.networking.terraform.tfstate'
 
-    - job: 'TerraformPlan_Networking'
-      dependsOn: 'TerraformInit_Networking'
-      displayName: 'Run Terraform Plan for Dev Environment Networking'
-      pool: Self-Hosted
-
-      steps:
         - task: TerraformTaskV3@3
           inputs:
             provider: 'azurerm'
@@ -64,8 +58,8 @@ stages:
   displayName: Dev Environment Key Vault
   
   jobs:          
-    - job: 'TerraformInit_KeyVault'
-      displayName: 'Initialize Terraform for Dev Environment Key Vault'
+    - job: 'TerraformInitPlan_KeyVault'
+      displayName: 'Initialize and Plan Terraform for Dev Environment Key Vault'
       pool: Self-Hosted
       
       steps:
@@ -80,11 +74,6 @@ stages:
             backendAzureRmContainerName: 'dev-tfstate'
             backendAzureRmKey: 'dev.keyvault.terraform.tfstate'
 
-    - job: 'TerraformPlan_KeyVault'
-      dependsOn: 'TerraformInit_KeyVault'
-      displayName: 'Run Terraform Plan for Dev Environment Key Vault'
-      pool: Self-Hosted
-      steps:
         - task: TerraformTaskV3@3
           inputs:
             provider: 'azurerm'
@@ -119,8 +108,8 @@ stages:
   displayName: Dev Environment Linux VM
 
   jobs:          
-    - job: 'TerraformInit_LinuxVM'
-      displayName: 'Initialize Terraform for Dev Environment Linux VM'
+    - job: 'TerraformInitPlan_LinuxVM'
+      displayName: 'Initialize and Plan Terraform for Dev Environment Linux VM'
       pool: Self-Hosted
       steps:
         - task: TerraformTaskV3@3
@@ -134,12 +123,6 @@ stages:
             backendAzureRmContainerName: 'dev-tfstate'
             backendAzureRmKey: 'dev.virtualmachines.terraform.tfstate'
 
-    - job: 'TerraformPlan_LinuxVM'
-      dependsOn: 'TerraformInit_LinuxVM'
-      displayName: 'Run Terraform Plan for Dev Environment Linux VM'
-      pool: Self-Hosted
-
-      steps:
         - task: TerraformTaskV3@3
           inputs:
             provider: 'azurerm'
@@ -174,8 +157,8 @@ stages:
   displayName: Dev Environment Windows VM
 
   jobs:
-    - job: 'TerraformInit_WindowsVM'
-      displayName: 'Initialize Terraform for Dev Environment Windows VM'
+    - job: 'TerraformInitPlan_WindowsVM'
+      displayName: 'Initialize and Plan Terraform for Dev Environment Windows VM'
       pool: Self-Hosted
       
       steps:
@@ -189,13 +172,6 @@ stages:
             backendAzureRmStorageAccountName: 'stprodtfsan01'
             backendAzureRmContainerName: 'dev-tfstate'
             backendAzureRmKey: 'dev.virtualmachines.terraform.tfstate'
-
-    - job: 'TerraformPlan_WindowsVM'
-      dependsOn: 'TerraformInit_WindowsVM'
-      displayName: 'Run Terraform Plan for Dev Environment Windows VM'
-      pool: Self-Hosted
-
-      steps:
         - task: TerraformTaskV3@3
           inputs:
             provider: 'azurerm'
