@@ -43,18 +43,21 @@ stages:
   displayName: Dev Environment Networking Apply
   
   jobs:          
-    - job: 'TerraformApply_Networking'
+    - deployment: 'TerraformApply_Networking'
       displayName: 'Apply Terraform for Dev Environment Networking'
       pool: Self-Hosted
-      
-      steps:
-        - task: TerraformTaskV3@3
-          inputs:
-            provider: 'azurerm'
-            command: 'apply'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/01_vnet_subnet_nsg'
-            commandOptions: '-var-file="/terraform/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars'
-            environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
+      environment: Dev
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: TerraformTaskV3@3
+                inputs:
+                  provider: 'azurerm'
+                  command: 'apply'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/01_vnet_subnet_nsg'
+                  commandOptions: '-var-file="/terraform/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars'
+                  environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
             
 - stage: 'DevEnvironmentKeyVault'
   dependsOn: []
@@ -81,7 +84,6 @@ stages:
       dependsOn: 'TerraformInit_KeyVault'
       displayName: 'Run Terraform Plan for Dev Environment Key Vault'
       pool: Self-Hosted
-
       steps:
         - task: TerraformTaskV3@3
           inputs:
@@ -96,18 +98,21 @@ stages:
   displayName: Dev Environment Key Vault Apply
   
   jobs:          
-    - job: 'TerraformApply_KeyVault'
+    - deployment: 'TerraformApply_KeyVault'
       displayName: 'Apply Terraform for Dev Environment Key Vault'
       pool: Self-Hosted
-      
-      steps:
-        - task: TerraformTaskV3@3
-          inputs:
-            provider: 'azurerm'
-            command: 'apply'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/02_key_vault'
-            commandOptions: '-var-file="/terraform/variables/terraform-azure/key_vault/dev.tfvars'
-            environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
+      environment: Dev
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: TerraformTaskV3@3
+                inputs:
+                  provider: 'azurerm'
+                  command: 'apply'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/02_key_vault'
+                  commandOptions: '-var-file="/terraform/variables/terraform-azure/key_vault/dev.tfvars'
+                  environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
             
 - stage: 'DevEnvironmentLinuxVM'
   dependsOn: []
@@ -117,7 +122,6 @@ stages:
     - job: 'TerraformInit_LinuxVM'
       displayName: 'Initialize Terraform for Dev Environment Linux VM'
       pool: Self-Hosted
-      
       steps:
         - task: TerraformTaskV3@3
           inputs:
@@ -149,18 +153,21 @@ stages:
   displayName: Dev Environment Linux VM Apply
   
   jobs:          
-    - job: 'TerraformApply_LinuxVM'
+    - deployment: 'TerraformApply_LinuxVM'
       displayName: 'Apply Terraform for Dev Environment Linux VM'
       pool: Self-Hosted
-      
-      steps:
-        - task: TerraformTaskV3@3
-          inputs:
-            provider: 'azurerm'
-            command: 'apply'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux'
-            commandOptions: '-var-file="/terraform/variables/terraform-azure/virtual_machine/linux/dev.tfvars'
-            environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
+      environment: Dev
+      strategy:
+        runOnce:
+          deploy:     
+            steps:
+              - task: TerraformTaskV3@3
+                inputs:
+                  provider: 'azurerm'
+                  command: 'apply'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux'
+                  commandOptions: '-var-file="/terraform/variables/terraform-azure/virtual_machine/linux/dev.tfvars'
+                  environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
 
 - stage: 'DevEnvironmentWindowsVM'
   dependsOn: []
@@ -202,16 +209,19 @@ stages:
   displayName: Dev Environment Windows VM Apply
   
   jobs:          
-    - job: 'TerraformApply_WindowsVM'
+    - deployment: 'TerraformApply_WindowsVM'
       displayName: 'Apply Terraform for Dev Environment Linux VM'
       pool: Self-Hosted
-      
-      steps:
-        - task: TerraformTaskV3@3
-          inputs:
-            provider: 'azurerm'
-            command: 'apply'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux'
-            commandOptions: '-var-file="/terraform/variables/terraform-azure/virtual_machine/linux/dev.tfvars'
-            environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
+      environment: Dev
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: TerraformTaskV3@3
+                inputs:
+                  provider: 'azurerm'
+                  command: 'apply'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux'
+                  commandOptions: '-var-file="/terraform/variables/terraform-azure/virtual_machine/linux/dev.tfvars'
+                  environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
       
