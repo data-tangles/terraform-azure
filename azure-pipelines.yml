@@ -1,0 +1,16 @@
+trigger:
+- none
+
+stages:
+
+- stage: 'Dev Environment'
+  dependsOn: []
+  displayName: Dev Environment
+
+  jobs:
+    - job: 'TerraformInit'
+      displayName: 'Initialize Terraform for Dev Environment'
+      pool: Self-Hosted
+      
+      steps:
+        - 
