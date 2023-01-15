@@ -4,5 +4,4 @@ resource "azurerm_subnet" "vm_subnet" {
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = var.vm_snet_address_prefixes
   depends_on = [ azurerm_virtual_network.vnet]
-  tags = "${merge( local.common_tags)}"
 }
