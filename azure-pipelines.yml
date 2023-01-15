@@ -28,7 +28,7 @@ stages:
           inputs:
             provider: 'azurerm'
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/01_vnet_subnet_nsg'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/01_vnet_subnet_nsg/'
             commandOptions: '-var-file="/terraform/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars'
             environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
             
@@ -49,7 +49,7 @@ stages:
                 inputs:
                   provider: 'azurerm'
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/01_vnet_subnet_nsg'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/01_vnet_subnet_nsg/'
                   commandOptions: '-var-file="/terraform/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars'
                   environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
             
@@ -78,7 +78,7 @@ stages:
           inputs:
             provider: 'azurerm'
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/02_key_vault'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/02_key_vault/'
             commandOptions: '-var-file="/terraform/variables/terraform-azure/key_vault/dev.tfvars'
             environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
             
@@ -99,7 +99,7 @@ stages:
                 inputs:
                   provider: 'azurerm'
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/02_key_vault'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/02_key_vault/'
                   commandOptions: '-var-file="/terraform/variables/terraform-azure/key_vault/dev.tfvars'
                   environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
             
@@ -116,7 +116,7 @@ stages:
           inputs:
             provider: 'azurerm'
             command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux/'
             backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
             backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
             backendAzureRmStorageAccountName: 'stprodtfsan01'
@@ -127,7 +127,7 @@ stages:
           inputs:
             provider: 'azurerm'
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux/'
             commandOptions: '-var-file="/terraform/variables/terraform-azure/virtual_machine/linux/dev.tfvars'
             environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
             
@@ -148,7 +148,7 @@ stages:
                 inputs:
                   provider: 'azurerm'
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux/'
                   commandOptions: '-var-file="/terraform/variables/terraform-azure/virtual_machine/linux/dev.tfvars'
                   environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
 
@@ -166,7 +166,7 @@ stages:
           inputs:
             provider: 'azurerm'
             command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/windows'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/windows/'
             backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
             backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
             backendAzureRmStorageAccountName: 'stprodtfsan01'
@@ -176,7 +176,7 @@ stages:
           inputs:
             provider: 'azurerm'
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/windows'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/windows/'
             commandOptions: '-var-file="/terraform/variables/terraform-azure/virtual_machine/windows/dev.tfvars'
             environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
 
@@ -197,7 +197,7 @@ stages:
                 inputs:
                   provider: 'azurerm'
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux'
-                  commandOptions: '-var-file="/terraform/variables/terraform-azure/virtual_machine/linux/dev.tfvars'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/windows/'
+                  commandOptions: '-var-file="/terraform/variables/terraform-azure/virtual_machine/windows/dev.tfvars'
                   environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
       
