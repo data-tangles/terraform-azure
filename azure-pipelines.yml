@@ -10,7 +10,7 @@ stages:
   jobs:
     - job: 'TerraformInitPlan_Networking'
       displayName: 'Initialize and Plan Terraform for Prod Environment Networking'
-      pool: Self-Hosted
+      pool: 'Azure Pipelines'
       
       steps:
         - task: TerraformCLI@0
@@ -40,7 +40,7 @@ stages:
   jobs:          
     - deployment: 'TerraformApply_Networking'
       displayName: 'Apply Terraform for Prod Environment Networking'
-      pool: Self-Hosted
+      pool: 'Azure Pipelines'
       environment: Prod
       strategy:
         runOnce:
