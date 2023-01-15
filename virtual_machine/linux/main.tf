@@ -8,7 +8,9 @@ terraform {
   backend "azurerm" {}
 }
 
-provider "azurerm" {}
+provider "azurerm" {
+  features {}
+}
 
 data "azurerm_key_vault_secret" "vmpassword" {
   name = "vmpassword"

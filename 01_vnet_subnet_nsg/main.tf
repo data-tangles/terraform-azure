@@ -8,7 +8,9 @@ terraform {
   backend "azurerm" {}
 }
 
-provider "azurerm" {}
+provider "azurerm" {
+  features {}
+}
 
 locals {
   common_tags = {
