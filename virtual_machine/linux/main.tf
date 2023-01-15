@@ -15,6 +15,16 @@ data "azurerm_key_vault_secret" "vmpassword" {
   vault_uri = var.kv_uri
 }
 
+data "terraform_remote_state" "networking" {
+  backend = "azurerm"
+  config = {
+    key                  = "dev.networking.terraform.tfstate"
+    container_name       = "dev-tfstate"
+    resource_group_name  = "stprodtfsan01"
+    storage_account_name = "MyStorageAccount"
+  }
+}
+
 locals {
   common_tags = {
     environment  = var.tag_environment
@@ -26,7 +36,6 @@ locals {
 resource "azurerm_resource_group" "linux_vm_rg" {
   name     = var.rg_name
   location = var.rg_location
-
   tags = "${merge( local.common_tags)}"
 }
 
@@ -37,12 +46,10 @@ resource "azurerm_network_interface" "vm_nic" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.vm_subnet.id
+    subnet_id                     = "${data.terraform_remote_state.networking.vm_snet_id}"
     private_ip_address_allocation = "Dynamic"
     
   }
-
-  tags = "${merge( local.common_tags)}"
 }
 
 resource "azurerm_linux_virtual_machine" "linux_vm" {
@@ -66,6 +73,4 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
     offer     = var.offer
     sku       = var.sku
   }
-
-  tags = "${merge( local.common_tags)}"
 }
