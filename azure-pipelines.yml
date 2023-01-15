@@ -52,7 +52,7 @@ stages:
                   command: 'apply'
                   workingDirectory: '$(System.DefaultWorkingDirectory)/01_vnet_subnet_nsg/'
                   commandOptions: '-var-file="/terraform/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars'
-                  environmentServiceNameAzureRM: 'Visual Studio Enterprise Subscription - MPN'
+                  environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
                   allowTelemetryCollection: false
             
 - stage: 'DevEnvironmentKeyVault'
