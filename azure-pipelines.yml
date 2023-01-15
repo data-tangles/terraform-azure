@@ -59,7 +59,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(project_folder)'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/${BUILD_BUILDNUMBER}.tfplan'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
