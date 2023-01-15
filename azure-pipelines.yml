@@ -1,3 +1,15 @@
+resources:
+  repositories:
+    - repository: 'TerraformVars'
+      type: github
+      endpoint: qman-being
+      name: qman-being/terraform-vars
+
+parameters:
+  - name: terraformVersion
+    type: string
+    default: 'latest'
+
 trigger:
 - none
 
@@ -13,6 +25,8 @@ stages:
       pool: Self-Hosted
       
       steps:
+        - checkout: self
+        - checkout: TerraformVars
         - task: TerraformCLI@0
           displayName: 'Dev Networking Terraform Init'
           inputs:
