@@ -51,7 +51,7 @@ stages:
           inputs:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars -out ${BUILD_BUILDNUMBER}.tfplan'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
             allowTelemetryCollection: false
 
