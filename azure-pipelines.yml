@@ -27,6 +27,12 @@ stages:
       steps:
         - checkout: self
         - checkout: TerraformVars
+
+        - task: TerraformInstaller@0
+          displayName: 'Terraform Install'
+          inputs:
+            terraformVersion: ${{ parameters.terraformVersion }}
+            
         - task: TerraformCLI@0
           displayName: 'Dev Networking Terraform Init'
           inputs:
@@ -45,7 +51,7 @@ stages:
           inputs:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/01_vnet_subnet_nsg/'
-            commandOptions: '-var-file="/terraform/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars'
             environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
             allowTelemetryCollection: false
             
@@ -62,11 +68,17 @@ stages:
         runOnce:
           deploy:
             steps:
+              - checkout: self
+              - checkout: TerraformVars
+              - task: TerraformInstaller@0
+                displayName: 'Terraform Install'
+                inputs:
+                  terraformVersion: ${{ parameters.terraformVersion }}
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
                   workingDirectory: '$(System.DefaultWorkingDirectory)/01_vnet_subnet_nsg/'
-                  commandOptions: '-var-file="/terraform/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars'
+                  commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars'
                   environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
                   allowTelemetryCollection: false
             
