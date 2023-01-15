@@ -50,8 +50,8 @@ stages:
           displayName: 'Dev Networking Terraform Plan'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/01_vnet_subnet_nsg/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars'
             environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
             allowTelemetryCollection: false
             
@@ -77,8 +77,8 @@ stages:
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/01_vnet_subnet_nsg/'
-                  commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/'
+                  commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars'
                   environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
                   allowTelemetryCollection: false
             
