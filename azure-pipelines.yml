@@ -22,7 +22,7 @@ stages:
   jobs:
     - job: 'TerraformInitPlan_Networking'
       displayName: 'Initialize and Plan Terraform for Dev Environment Networking'
-      pool: Self-Hosted
+      pool: 'Azure Pipelines'
       
       steps:
         - checkout: self
@@ -62,7 +62,7 @@ stages:
   jobs:          
     - deployment: 'TerraformApply_Networking'
       displayName: 'Apply Terraform for Dev Environment Networking'
-      pool: Self-Hosted
+      pool: 'Azure Pipelines'
       environment: Dev
       strategy:
         runOnce:
