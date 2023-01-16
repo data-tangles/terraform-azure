@@ -454,7 +454,7 @@ stages:
                 inputs:
                   archiveFilePatterns: '$(Pipeline.Workspace)/prod-storage-plan/$(Build.BuildNumber).tgz'
                   destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/'
-                  cleanDestinationFolder: false
+                  cleanDestinationFolder: yes
 
               - task: TerraformCLI@0
                 inputs:
