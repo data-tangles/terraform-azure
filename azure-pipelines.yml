@@ -393,7 +393,7 @@ stages:
           displayName: 'Prod Storage Terraform Plan'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/windows/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/'
             commandOptions: '-var-file="/terraform/variables/terraform-azure/storage/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
             allowTelemetryCollection: false
