@@ -116,9 +116,12 @@ stages:
   jobs:          
     - job: 'TerraformInitPlan_KeyVault'
       displayName: 'Initialize and Plan Terraform for Dev Environment Key Vault'
-      pool: Self-Hosted
+      pool: 'Azure Pipelines'
       
       steps:
+        - checkout: self
+        - checkout: TerraformVars
+
         - task: TerraformCLI@0
           displayName: 'Dev Key Vault Terraform Init'
           inputs:
@@ -166,7 +169,7 @@ stages:
   jobs:          
     - deployment: 'TerraformApply_KeyVault'
       displayName: 'Apply Terraform for Dev Environment Key Vault'
-      pool: Self-Hosted
+      pool: 'Azure Pipelines'
       environment: Dev
       strategy:
         runOnce:
@@ -202,8 +205,11 @@ stages:
   jobs:          
     - job: 'TerraformInitPlan_LinuxVM'
       displayName: 'Initialize and Plan Terraform for Dev Environment Linux VM'
-      pool: Self-Hosted
+      pool: 'Azure Pipelines'
       steps:
+        - checkout: self
+        - checkout: TerraformVars
+
         - task: TerraformCLI@0
           displayName: 'Dev Linux VM Terraform Init'
           inputs:
@@ -251,7 +257,7 @@ stages:
   jobs:          
     - deployment: 'TerraformApply_LinuxVM'
       displayName: 'Apply Terraform for Dev Environment Linux VM'
-      pool: Self-Hosted
+      pool: 'Azure Pipelines'
       environment: Dev
       strategy:
         runOnce:
@@ -287,7 +293,7 @@ stages:
   jobs:
     - job: 'TerraformInitPlan_WindowsVM'
       displayName: 'Initialize and Plan Terraform for Dev Environment Windows VM'
-      pool: Self-Hosted
+      pool: 'Azure Pipelines'
       
       steps:
         - task: TerraformCLI@0
@@ -337,7 +343,7 @@ stages:
   jobs:          
     - deployment: 'TerraformApply_WindowsVM'
       displayName: 'Apply Terraform for Dev Environment Windows VM'
-      pool: Self-Hosted
+      pool: 'Azure Pipelines'
       environment: Dev
       strategy:
         runOnce:
