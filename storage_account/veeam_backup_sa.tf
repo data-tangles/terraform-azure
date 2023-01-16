@@ -44,9 +44,3 @@ resource "azurerm_storage_account_network_rules" "veeam_backup_sa_nr" {
   ip_rules                   = var.allowed_sa_ips
   bypass                     = ["Metrics"]
 }
-
-resource "azurerm_management_lock" "veeam_backup" {
-  name       = "${var.veeam_sa_name}-lock"
-  scope      = azurerm_storage_account.veeam_backup.id
-  lock_level = "CanNotDelete"
-}
