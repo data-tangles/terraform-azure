@@ -59,7 +59,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/${BUILD_BUILDNUMBER}.tfplan'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -148,7 +148,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/02_key_vault/${BUILD_BUILDNUMBER}.tfplan'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/02_key_vault/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -236,7 +236,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/linux/${BUILD_BUILDNUMBER}.tfplan'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/linux/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -325,7 +325,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/windows/${BUILD_BUILDNUMBER}.tfplan'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/windows/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -414,7 +414,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/${BUILD_BUILDNUMBER}.tfplan'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
