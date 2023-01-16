@@ -30,9 +30,10 @@ resource "azurerm_storage_account" "veeam_backup" {
   name                     = var.veeam_sa_name
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
-  account_kind             = "BlobStorage"
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+  account_kind             = var.account_kind
+  account_tier             = var.account_tier
+  access_tier              = var.access_tier
+  account_replication_type = var.account_replication_type
   tags = "${merge( local.common_tags)}"
 }
 
