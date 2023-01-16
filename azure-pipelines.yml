@@ -119,6 +119,9 @@ stages:
       pool: 'Azure Pipelines'
       
       steps:
+        - checkout: self
+        - checkout: TerraformVars
+
         - task: TerraformCLI@0
           displayName: 'Prod Key Vault Terraform Init'
           inputs:
@@ -204,6 +207,9 @@ stages:
       displayName: 'Initialize and Plan Terraform for Prod Environment Linux VM'
       pool: 'Azure Pipelines'
       steps:
+        - checkout: self
+        - checkout: TerraformVars
+
         - task: TerraformCLI@0
           displayName: 'Prod Linux VM Terraform Init'
           inputs:
@@ -290,6 +296,9 @@ stages:
       pool: 'Azure Pipelines'
       
       steps:
+        - checkout: self
+        - checkout: TerraformVars
+
         - task: TerraformCLI@0
           displayName: 'Prod Windows VM Terraform Init'
           inputs:
@@ -376,6 +385,9 @@ stages:
       pool: 'Azure Pipelines'
       
       steps:
+        - checkout: self
+        - checkout: TerraformVars
+        
         - task: TerraformCLI@0
           displayName: 'Prod Storage Terraform Init'
           inputs:
