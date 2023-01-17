@@ -50,7 +50,7 @@ resource "azurerm_storage_account_network_rules" "veeam_backup_sa_nr" {
 
 resource "azurerm_storage_share" "veeam_backup_fs" {
   name                 = var.fs_name
-  storage_account_name = azurerm_storage_account.veeam_backup.id
+  storage_account_name = azurerm_storage_account.veeam_backup.name
   quota                = var.fs_quota
   access_tier          = var.fs_access_tier
 }
