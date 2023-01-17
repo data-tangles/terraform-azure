@@ -42,3 +42,18 @@ variable "allowed_sa_ips" {
     type = list(string)
     description = "Allowed Public IP's"
 }
+
+variable "fs_name" {
+    type = string
+    description = "File Share name"
+}
+
+variable "fs_quota" {
+    type = string
+    description = "Quota for File Share"
+}
+
+variable "fs_access_tier" {
+    type = string
+    description = "File Share access tier"
+}
