@@ -43,4 +43,7 @@ resource "azurerm_storage_account_network_rules" "veeam_backup_sa_nr" {
   default_action             = "Deny"
   ip_rules                   = var.allowed_sa_ips
   bypass                     = ["Metrics"]
+  depends_on = [
+    azurerm_storage_account.veeam_backup
+  ]
 }
