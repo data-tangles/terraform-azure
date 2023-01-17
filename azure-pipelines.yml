@@ -38,7 +38,7 @@ stages:
           inputs:
             command: 'init'
             backendType: 'azurerm'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/'
             backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
             backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
             backendAzureRmStorageAccountName: 'stprodtfsan01'
@@ -127,7 +127,7 @@ stages:
           inputs:
             command: 'init'
             backendType: 'azurerm'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/02_key_vault'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/02_key_vault/'
             backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
             backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
             backendAzureRmStorageAccountName: 'stprodtfsan01'
