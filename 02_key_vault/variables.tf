@@ -1,20 +1,24 @@
 variable "tag_environment" {
-    type = string
-    description = "Tag Value for Environment"
+  type        = string
+  description = "Tag Value for Environment"
 }
 
 variable "rg_name" {
-    type = string
-    description = "Name of the Resource Group"
+  type        = string
+  description = "Name of the Resource Group"
 }
 
 variable "rg_location" {
-    type = string
-    description = "Location of the Resource Group"
+  type        = string
+  description = "Location of the Resource Group"
 }
 
 variable "kv_name" {
-    type = string
-    description = "Name of the Key Vault"
+  type        = string
+  description = "Name of the Key Vault"
 }
 
+variable "allowed_ip_list" {
+  type        = list(string)
+  description = "Allowed IP list"
+}

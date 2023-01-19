@@ -154,7 +154,7 @@ stages:
             tarCompression: 'gz'
             archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
             replaceExistingArchive: true
-  
+            
         - task: PublishPipelineArtifact@1
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Publish Plan Artifact'
@@ -198,6 +198,7 @@ stages:
                   environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
                   allowTelemetryCollection: false
             
+
 - stage: 'ProdEnvironmentLinuxVM'
   dependsOn: []
   displayName: Prod Environment Linux VM
@@ -242,7 +243,7 @@ stages:
             tarCompression: 'gz'
             archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
             replaceExistingArchive: true
-    
+            
         - task: PublishPipelineArtifact@1
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Publish Plan Artifact'
@@ -331,7 +332,7 @@ stages:
             tarCompression: 'gz'
             archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
             replaceExistingArchive: true
-      
+            
         - task: PublishPipelineArtifact@1
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Publish Plan Artifact'
@@ -374,6 +375,7 @@ stages:
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
                   allowTelemetryCollection: false
+
 
 - stage: 'ProdEnvironmentStorage'
   dependsOn: []

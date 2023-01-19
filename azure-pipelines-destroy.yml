@@ -1,0 +1,217 @@
+parameters:
+  - name: terraformVersion
+    type: string
+    default: 'latest'
+
+trigger:
+- none
+
+stages:
+
+- stage: 'DevEnvironmentNetworking'
+  dependsOn: []
+  displayName: Dev Environment Networking
+
+  jobs:
+    - job: 'TerraformInit_Networking'
+      displayName: 'Initialize and Destroy Dev Environment Networking'
+      pool: 'Azure Pipelines'
+      
+      steps:
+
+        - task: TerraformInstaller@0
+          displayName: 'Terraform Install'
+          inputs:
+            terraformVersion: ${{ parameters.terraformVersion }}
+            
+        - task: TerraformCLI@0
+          displayName: 'Dev Networking Terraform Init'
+          inputs:
+            command: 'init'
+            backendType: 'azurerm'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg'
+            backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
+            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
+            backendAzureRmStorageAccountName: 'stprodtfsan01'
+            backendAzureRmContainerName: 'dev-tfstate'
+            backendAzureRmKey: 'dev.networking.terraform.tfstate'
+            allowTelemetryCollection: false
+
+    - job: 'waitForValidation'
+      displayName: "Wait > Wait for manual appoval"
+      pool: 'Azure Pipelines'
+      timeoutInMinutes: "4320" 
+      steps:
+
+        - task: ManualValidation@0
+          timeoutInMinutes: "1440"
+          inputs:
+            notifyUsers: |                    
+                [homelab]\Project Administrators
+            instructions: "Terraform will destroy resources. Please review and approve if this is intended"
+            onTimeout: "reject"         
+
+    - job: 'TerraformNetworkingDestroy'
+      displayName: 'Destroy Dev Environment Networking'
+      dependsOn: 'waitForValidation'
+      steps:
+
+        - task: TerraformCLI@0
+          displayName: 'Terraform Destroy'
+          inputs:
+            command: 'destroy'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg'
+            environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
+            allowTelemetryCollection: false
+
+- stage: 'DevEnvironmentKeyVault'
+  dependsOn: []
+  displayName: Dev Environment Key Vault
+  
+  jobs:          
+    - job: 'TerraformInit_KeyVault'
+      displayName: 'Initialize and Destroy Dev Environment Key Vault'
+      pool: 'Azure Pipelines'
+      
+      steps:
+
+        - task: TerraformCLI@0
+          displayName: 'Dev Key Vault Terraform Init'
+          inputs:
+            command: 'init'
+            backendType: 'azurerm'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/02_key_vault/'
+            backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
+            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
+            backendAzureRmStorageAccountName: 'stprodtfsan01'
+            backendAzureRmContainerName: 'dev-tfstate'
+            backendAzureRmKey: 'dev.keyvault.terraform.tfstate'
+            allowTelemetryCollection: false
+
+    - job: 'waitForValidation'
+      displayName: "Wait > Wait for manual appoval"
+      pool: 'Azure Pipelines'
+      timeoutInMinutes: "4320" 
+      steps:
+
+        - task: ManualValidation@0
+          timeoutInMinutes: "1440"
+          inputs:
+            notifyUsers: |                    
+                [homelab]\Project Administrators
+            instructions: "Terraform will destroy resources. Please review and approve if this is intended"
+            onTimeout: "reject"         
+
+    - job: 'TerraformKeyVaultDestroy'
+      displayName: 'Destroy Dev Environment Key Vault'
+      dependsOn: 'waitForValidation'
+      steps:
+
+        - task: TerraformCLI@0
+          displayName: 'Dev Key Vault Terraform Destroy'
+          inputs:
+            command: 'destroy'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/02_key_vault/'
+            environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
+            allowTelemetryCollection: false
+            
+- stage: 'DevEnvironmentLinuxVM'
+  dependsOn: []
+  displayName: Dev Environment Linux VM
+
+  jobs:          
+    - job: 'TerraformInitPlan_LinuxVM'
+      displayName: 'Initialize and Destroy Dev Environment Linux VM'
+      pool: 'Azure Pipelines'
+      steps:
+
+        - task: TerraformCLI@0
+          displayName: 'Dev Linux VM Terraform Init'
+          inputs:
+            backendType: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux/'
+            backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
+            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
+            backendAzureRmStorageAccountName: 'stprodtfsan01'
+            backendAzureRmContainerName: 'dev-tfstate'
+            backendAzureRmKey: 'dev.virtualmachines.terraform.tfstate'
+            allowTelemetryCollection: false
+
+    - job: 'waitForValidation'
+      displayName: "Wait > Wait for manual appoval"
+      pool: 'Azure Pipelines'
+      timeoutInMinutes: "4320" 
+      steps:
+
+        - task: ManualValidation@0
+          timeoutInMinutes: "1440"
+          inputs:
+            notifyUsers: |                    
+                [homelab]\Project Administrators
+            instructions: "Terraform will destroy resources. Please review and approve if this is intended"
+            onTimeout: "reject"         
+
+    - job: 'TerraformLinuxVMDestroy'
+      displayName: 'Destroy Dev Environment Linux VM'
+      dependsOn: 'waitForValidation'
+      steps:
+
+        - task: TerraformCLI@0
+          displayName: 'Dev Linux VM Terraform Destroy'
+          inputs:
+            command: 'destroy'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/linux/'
+            environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
+            allowTelemetryCollection: false
+
+- stage: 'DevEnvironmentWindowsVM'
+  dependsOn: []
+  displayName: Dev Environment Windows VM
+
+  jobs:
+    - job: 'TerraformInit_WindowsVM'
+      displayName: 'Initialize and Destroy Dev Environment Windows VM'
+      pool: 'Azure Pipelines'
+      
+      steps:
+        - task: TerraformCLI@0
+          displayName: 'Dev Windows VM Terraform Init'
+          inputs:
+            backendType: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/windows/'
+            backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
+            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
+            backendAzureRmStorageAccountName: 'stprodtfsan01'
+            backendAzureRmContainerName: 'dev-tfstate'
+            backendAzureRmKey: 'dev.virtualmachines.terraform.tfstate'
+            allowTelemetryCollection: false
+
+    - job: 'waitForValidation'
+      displayName: "Wait > Wait for manual appoval"
+      pool: 'Azure Pipelines'
+      timeoutInMinutes: "4320" 
+      steps:
+
+        - task: ManualValidation@0
+          timeoutInMinutes: "1440"
+          inputs:
+            notifyUsers: |                    
+                [homelab]\Project Administrators
+            instructions: "Terraform will destroy resources. Please review and approve if this is intended"
+            onTimeout: "reject"         
+
+    - job: 'TerraformWindowsVMDestroy'
+      displayName: 'Destroy Dev Environment Windows VM'
+      dependsOn: 'waitForValidation'
+      steps:
+
+        - task: TerraformCLI@0
+          displayName: 'Dev Windows VM Terraform Destroy'
+          inputs:
+            command: 'destroy'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/windows/'
+            environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
+            allowTelemetryCollection: false
+      
