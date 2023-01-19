@@ -44,6 +44,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_vm_snet_id"></a> [vm\_snet\_id](#output\_vm\_snet\_id) | n/a |
-| <a name="output_vnet_id"></a> [vnet\_id](#output\_vnet\_id) | n/a |
+| <a name="output_vm_snet_id"></a> [vm\_snet\_id](#output\_vm\_snet\_id) | Outputs the subnet ID |
+| <a name="output_vnet_id"></a> [vnet\_id](#output\_vnet\_id) | Outputs the vNet ID |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
