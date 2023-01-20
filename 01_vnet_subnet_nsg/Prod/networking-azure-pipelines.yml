@@ -15,13 +15,13 @@ trigger:
 
 stages:
 
-- stage: 'DevEnvironmentNetworking'
+- stage: 'ProdEnvironmentNetworking'
   dependsOn: []
-  displayName: Dev Environment Networking
+  displayName: Prod Environment Networking
 
   jobs:
     - job: 'TerraformInitPlan_Networking'
-      displayName: 'Initialize and Plan Terraform for Dev Environment Networking'
+      displayName: 'Initialize and Plan Terraform for Prod Environment Networking'
       pool: 'Azure Pipelines'
       
       steps:
@@ -34,24 +34,24 @@ stages:
             terraformVersion: ${{ parameters.terraformVersion }}
             
         - task: TerraformCLI@0
-          displayName: 'Dev Networking Terraform Init'
+          displayName: 'Prod Networking Terraform Init'
           inputs:
             command: 'init'
             backendType: 'azurerm'
             workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg'
             backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
-            backendAzureRmResourceGroupName: 'rg-storage-dev-san-01'
-            backendAzureRmStorageAccountName: 'stdevtfsan01'
-            backendAzureRmContainerName: 'dev-tfstate'
-            backendAzureRmKey: 'dev.networking.terraform.tfstate'
+            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
+            backendAzureRmStorageAccountName: 'stprodtfsan01'
+            backendAzureRmContainerName: 'prod-tfstate'
+            backendAzureRmKey: 'prod.networking.terraform.tfstate'
             allowTelemetryCollection: false
 
         - task: TerraformCLI@0
-          displayName: 'Dev Networking Terraform Plan'
+          displayName: 'Prod Networking Terraform Plan'
           inputs:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/vnet_subnet_nsg/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
             allowTelemetryCollection: false
 
@@ -71,17 +71,17 @@ stages:
           displayName: 'Publish Plan Artifact'
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'dev-networking-plan'
+            artifactName: 'prod-networking-plan'
             
-- stage: 'DevEnvironmentNetworkingApply'
-  dependsOn: 'DevEnvironmentNetworking'
-  displayName: Dev Environment Networking Apply
+- stage: 'ProdEnvironmentNetworkingApply'
+  dependsOn: 'ProdEnvironmentNetworking'
+  displayName: Prod Environment Networking Apply
   
   jobs:          
     - deployment: 'TerraformApply_Networking'
-      displayName: 'Apply Terraform for Dev Environment Networking'
+      displayName: 'Apply Terraform for Prod Environment Networking'
       pool: 'Azure Pipelines'
-      environment: Dev
+      environment: Prod
       strategy:
         runOnce:
           deploy:
@@ -97,7 +97,7 @@ stages:
               - task: ExtractFiles@1
                 displayName: 'Extract Plan Artifact'
                 inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-networking-plan/$(Build.BuildNumber).tgz'
+                  archiveFilePatterns: '$(Pipeline.Workspace)/prod-networking-plan/$(Build.BuildNumber).tgz'
                   destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/'
                   cleanDestinationFolder: true
 
