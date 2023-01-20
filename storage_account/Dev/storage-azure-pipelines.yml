@@ -1,0 +1,106 @@
+resources:
+  repositories:
+    - repository: 'TerraformVars'
+      type: github
+      endpoint: qman-being
+      name: qman-being/terraform-vars
+
+parameters:
+  - name: terraformVersion
+    type: string
+    default: 'latest'
+
+trigger:
+- none
+
+stages:
+
+- stage: 'DevEnvironmentStorage'
+  dependsOn: []
+  displayName: Dev Environment Storage
+
+  jobs:
+    - job: 'TerraformInitPlan_Storage'
+      displayName: 'Initialize and Plan Terraform for Dev Environment Storage'
+      pool: 'Azure Pipelines'
+      
+      steps:
+        - checkout: self
+        - checkout: TerraformVars
+        
+        - task: TerraformCLI@0
+          displayName: 'Dev Storage Terraform Init'
+          inputs:
+            backendType: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/'
+            backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
+            backendAzureRmResourceGroupName: 'rg-storage-dev-san-01'
+            backendAzureRmStorageAccountName: 'stprodtfsan01'
+            backendAzureRmContainerName: 'dev-tfstate'
+            backendAzureRmKey: 'dev.storage.terraform.tfstate'
+            allowTelemetryCollection: false
+
+        - task: TerraformCLI@0
+          displayName: 'Dev Storage Terraform Plan'
+          inputs:
+            command: 'plan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/storage/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
+            allowTelemetryCollection: false
+
+        - task: ArchiveFiles@2
+          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+          displayName: 'Create Plan Artifact'
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/'
+            includeRootFolder: false
+            archiveType: 'tar'
+            tarCompression: 'gz'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
+            replaceExistingArchive: true
+      
+        - task: PublishPipelineArtifact@1
+          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+          displayName: 'Publish Plan Artifact'
+          inputs:
+            targetPath: '$(Build.ArtifactStagingDirectory)'
+            artifactName: 'dev-storage-plan'
+
+- stage: 'DevEnvironmentStorageApply'
+  dependsOn: 'DevEnvironmentStorage'
+  displayName: Dev Environment Storage Apply
+  
+  jobs:          
+    - deployment: 'TerraformApply_Storage'
+      displayName: 'Apply Terraform for Dev Environment Storage'
+      pool: 'Azure Pipelines'
+      environment: Dev
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+              - checkout: TerraformVars
+
+              - task: TerraformInstaller@0
+                displayName: 'Terraform Install'
+                inputs:
+                  terraformVersion: ${{ parameters.terraformVersion }}
+
+              - task: ExtractFiles@1
+                displayName: 'Extract Plan Artifact'
+                inputs:
+                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-storage-plan/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/'
+                  cleanDestinationFolder: true
+
+              - task: TerraformCLI@0
+                inputs:
+                  command: 'apply'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/'
+                  commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
+                  environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
+                  allowTelemetryCollection: false
+      
