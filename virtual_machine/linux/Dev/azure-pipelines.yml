@@ -35,7 +35,7 @@ stages:
             workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux/'
             backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
             backendAzureRmResourceGroupName: 'rg-storage-dev-san-01'
-            backendAzureRmStorageAccountName: 'stdevtfsan01'
+            backendAzureRmStorageAccountName: 'stprodtfsan01'
             backendAzureRmContainerName: 'dev-tfstate'
             backendAzureRmKey: 'dev.virtualmachines.terraform.tfstate'
             allowTelemetryCollection: false

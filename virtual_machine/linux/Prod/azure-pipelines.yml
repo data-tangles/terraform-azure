@@ -15,37 +15,37 @@ trigger:
 
 stages:
 
-- stage: 'DevEnvironmentLinuxVM'
+- stage: 'ProdEnvironmentLinuxVM'
   dependsOn: []
-  displayName: Dev Environment Linux VM
+  displayName: Prod Environment Linux VM
 
   jobs:          
     - job: 'TerraformInitPlan_LinuxVM'
-      displayName: 'Initialize and Plan Terraform for Dev Environment Linux VM'
+      displayName: 'Initialize and Plan Terraform for Prod Environment Linux VM'
       pool: 'Azure Pipelines'
       steps:
         - checkout: self
         - checkout: TerraformVars
 
         - task: TerraformCLI@0
-          displayName: 'Dev Linux VM Terraform Init'
+          displayName: 'Prod Linux VM Terraform Init'
           inputs:
             backendType: 'azurerm'
             command: 'init'
             workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux/'
             backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
-            backendAzureRmResourceGroupName: 'rg-storage-dev-san-01'
-            backendAzureRmStorageAccountName: 'stdevtfsan01'
-            backendAzureRmContainerName: 'dev-tfstate'
-            backendAzureRmKey: 'dev.virtualmachines.terraform.tfstate'
+            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
+            backendAzureRmStorageAccountName: 'stprodtfsan01'
+            backendAzureRmContainerName: 'prod-tfstate'
+            backendAzureRmKey: 'prod.virtualmachines.terraform.tfstate'
             allowTelemetryCollection: false
 
         - task: TerraformCLI@0
-          displayName: 'Dev Linux VM Terraform Plan'
+          displayName: 'Prod Linux VM Terraform Plan'
           inputs:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/virtual_machine/linux/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/virtual_machine/linux/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
             allowTelemetryCollection: false
 
@@ -65,17 +65,17 @@ stages:
           displayName: 'Publish Plan Artifact'
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'dev-linuxvm-plan'
+            artifactName: 'prod-linuxvm-plan'
             
-- stage: 'DevEnvironmentLinuxVMApply'
-  dependsOn: 'DevEnvironmentLinuxVM'
-  displayName: Dev Environment Linux VM Apply
+- stage: 'ProdEnvironmentLinuxVMApply'
+  dependsOn: 'ProdEnvironmentLinuxVM'
+  displayName: Prod Environment Linux VM Apply
   
   jobs:          
     - deployment: 'TerraformApply_LinuxVM'
-      displayName: 'Apply Terraform for Dev Environment Linux VM'
+      displayName: 'Apply Terraform for Prod Environment Linux VM'
       pool: 'Azure Pipelines'
-      environment: Dev
+      environment: Prod
       strategy:
         runOnce:
           deploy:     
@@ -91,7 +91,7 @@ stages:
               - task: ExtractFiles@1
                 displayName: 'Extract Plan Artifact'
                 inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-linuxvm-plan/$(Build.BuildNumber).tgz'
+                  archiveFilePatterns: '$(Pipeline.Workspace)/prod-linuxvm-plan/$(Build.BuildNumber).tgz'
                   destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/linux/'
                   cleanDestinationFolder: false
 
@@ -103,13 +103,13 @@ stages:
                   environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
                   allowTelemetryCollection: false
 
-- stage: 'DevEnvironmentWindowsVM'
+- stage: 'ProdEnvironmentWindowsVM'
   dependsOn: []
-  displayName: Dev Environment Windows VM
+  displayName: Prod Environment Windows VM
 
   jobs:
     - job: 'TerraformInitPlan_WindowsVM'
-      displayName: 'Initialize and Plan Terraform for Dev Environment Windows VM'
+      displayName: 'Initialize and Plan Terraform for Prod Environment Windows VM'
       pool: 'Azure Pipelines'
       
       steps:
@@ -117,24 +117,24 @@ stages:
         - checkout: TerraformVars
 
         - task: TerraformCLI@0
-          displayName: 'Dev Windows VM Terraform Init'
+          displayName: 'Prod Windows VM Terraform Init'
           inputs:
             backendType: 'azurerm'
             command: 'init'
             workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/windows/'
             backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
-            backendAzureRmResourceGroupName: 'rg-storage-dev-san-01'
-            backendAzureRmStorageAccountName: 'stdevtfsan01'
-            backendAzureRmContainerName: 'dev-tfstate'
-            backendAzureRmKey: 'dev.virtualmachines.terraform.tfstate'
+            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
+            backendAzureRmStorageAccountName: 'stprodtfsan01'
+            backendAzureRmContainerName: 'prod-tfstate'
+            backendAzureRmKey: 'prod.virtualmachines.terraform.tfstate'
             allowTelemetryCollection: false
 
         - task: TerraformCLI@0
-          displayName: 'Dev Windows VM Terraform Plan'
+          displayName: 'Prod Windows VM Terraform Plan'
           inputs:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/windows/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/virtual_machine/windows/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/virtual_machine/windows/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
             allowTelemetryCollection: false
 
@@ -154,17 +154,17 @@ stages:
           displayName: 'Publish Plan Artifact'
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'dev-windowsvm-plan'
+            artifactName: 'prod-windowsvm-plan'
 
-- stage: 'DevEnvironmentWindowsVMApply'
-  dependsOn: 'DevEnvironmentWindowsVM'
-  displayName: Dev Environment Windows VM Apply
+- stage: 'ProdEnvironmentWindowsVMApply'
+  dependsOn: 'ProdEnvironmentWindowsVM'
+  displayName: Prod Environment Windows VM Apply
   
   jobs:          
     - deployment: 'TerraformApply_WindowsVM'
-      displayName: 'Apply Terraform for Dev Environment Windows VM'
+      displayName: 'Apply Terraform for Prod Environment Windows VM'
       pool: 'Azure Pipelines'
-      environment: Dev
+      environment: Prod
       strategy:
         runOnce:
           deploy:
@@ -180,7 +180,7 @@ stages:
               - task: ExtractFiles@1
                 displayName: 'Extract Plan Artifact'
                 inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-windowsvm-plan/$(Build.BuildNumber).tgz'
+                  archiveFilePatterns: '$(Pipeline.Workspace)/prod-windowsvm-plan/$(Build.BuildNumber).tgz'
                   destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/windows/'
                   cleanDestinationFolder: false
 
