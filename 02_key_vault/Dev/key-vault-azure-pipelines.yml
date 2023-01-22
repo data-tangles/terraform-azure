@@ -99,7 +99,7 @@ stages:
                 inputs:
                   archiveFilePatterns: '$(Pipeline.Workspace)/dev-keyvault-plan/$(Build.BuildNumber).tgz'
                   destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/02_key_vault/Dev/'
-                  cleanDestinationFolder: false
+                  cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:
