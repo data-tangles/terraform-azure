@@ -61,6 +61,7 @@ resource "azurerm_key_vault" "key_vault" {
   soft_delete_retention_days  = 7
   purge_protection_enabled    = true
   sku_name                    = "standard"
+  tags                        = merge(local.common_tags)
   network_acls {
     bypass                     = "AzureServices"
     default_action             = "Deny"
