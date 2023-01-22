@@ -49,7 +49,7 @@ resource "azurerm_network_interface" "vm_nic" {
   name                = "${var.vm_name}-nic"
   location            = azurerm_resource_group.windows_vm_rg.location
   resource_group_name = azurerm_resource_group.windows_vm_rg.name
-  tags                        = merge(local.common_tags)
+  tags                = merge(local.common_tags)
 
   ip_configuration {
     name                          = "internal"
@@ -65,7 +65,7 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
   size                = var.vm_size
   admin_username      = var.vm_user
   admin_password      = data.azurerm_key_vault_secret.vmpassword.value
-  tags                        = merge(local.common_tags)
+  tags                = merge(local.common_tags)
   network_interface_ids = [
     azurerm_network_interface.vm_nic.id,
   ]

@@ -2,7 +2,7 @@ resource "azurerm_network_security_group" "vm_snet_nsg" {
   location            = azurerm_resource_group.rg.location
   name                = "${var.vm_snet_name}-nsg"
   resource_group_name = azurerm_resource_group.rg.name
-  tags                        = merge(local.common_tags)
+  tags                = merge(local.common_tags)
 }
 
 resource "azurerm_subnet_network_security_group_association" "vm_snet_nsg_asc" {
