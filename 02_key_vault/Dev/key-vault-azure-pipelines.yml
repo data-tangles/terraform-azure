@@ -59,7 +59,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/02_key_vault/Dev/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/02_key_vault/Dev/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -98,13 +98,13 @@ stages:
                 displayName: 'Extract Plan Artifact'
                 inputs:
                   archiveFilePatterns: '$(Pipeline.Workspace)/dev-keyvault-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/02_key_vault/Dev/'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/02_key_vault/Dev/'
                   cleanDestinationFolder: false
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/02_key_vault/Dev/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/02_key_vault/Dev/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
                   allowTelemetryCollection: false
