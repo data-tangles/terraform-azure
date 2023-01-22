@@ -15,94 +15,6 @@ trigger:
 
 stages:
 
-- stage: 'DevEnvironmentLinuxVM'
-  dependsOn: []
-  displayName: Dev Environment Linux VM
-
-  jobs:          
-    - job: 'TerraformInitPlan_LinuxVM'
-      displayName: 'Initialize and Plan Terraform for Dev Environment Linux VM'
-      pool: 'Azure Pipelines'
-      steps:
-        - checkout: self
-        - checkout: TerraformVars
-
-        - task: TerraformCLI@0
-          displayName: 'Dev Linux VM Terraform Init'
-          inputs:
-            backendType: 'azurerm'
-            command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux/'
-            backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
-            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
-            backendAzureRmStorageAccountName: 'stprodtfsan01'
-            backendAzureRmContainerName: 'dev-tfstate'
-            backendAzureRmKey: 'dev.virtualmachines.terraform.tfstate'
-            allowTelemetryCollection: false
-
-        - task: TerraformCLI@0
-          displayName: 'Dev Linux VM Terraform Plan'
-          inputs:
-            command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/linux/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/virtual_machine/linux/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
-            environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
-            allowTelemetryCollection: false
-
-        - task: ArchiveFiles@2
-          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-          displayName: 'Create Plan Artifact'
-          inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/linux/'
-            includeRootFolder: false
-            archiveType: 'tar'
-            tarCompression: 'gz'
-            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
-            replaceExistingArchive: true
-            
-        - task: PublishPipelineArtifact@1
-          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-          displayName: 'Publish Plan Artifact'
-          inputs:
-            targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'dev-linuxvm-plan'
-            
-- stage: 'DevEnvironmentLinuxVMApply'
-  dependsOn: 'DevEnvironmentLinuxVM'
-  displayName: Dev Environment Linux VM Apply
-  
-  jobs:          
-    - deployment: 'TerraformApply_LinuxVM'
-      displayName: 'Apply Terraform for Dev Environment Linux VM'
-      pool: 'Azure Pipelines'
-      environment: Dev
-      strategy:
-        runOnce:
-          deploy:     
-            steps:
-              - checkout: self
-              - checkout: TerraformVars
-
-              - task: TerraformInstaller@0
-                displayName: 'Terraform Install'
-                inputs:
-                  terraformVersion: ${{ parameters.terraformVersion }}
-
-              - task: ExtractFiles@1
-                displayName: 'Extract Plan Artifact'
-                inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-linuxvm-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/linux/'
-                  cleanDestinationFolder: false
-
-              - task: TerraformCLI@0
-                inputs:
-                  command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/linux/'
-                  commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
-                  environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
-                  allowTelemetryCollection: false
-
 - stage: 'DevEnvironmentWindowsVM'
   dependsOn: []
   displayName: Dev Environment Windows VM
@@ -121,7 +33,7 @@ stages:
           inputs:
             backendType: 'azurerm'
             command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/windows/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/windows/Dev/'
             backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
             backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
             backendAzureRmStorageAccountName: 'stdevtfsan01'
@@ -133,7 +45,7 @@ stages:
           displayName: 'Dev Windows VM Terraform Plan'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/windows/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/virtual_machine/windows/Dev/'
             commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/virtual_machine/windows/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
             allowTelemetryCollection: false
@@ -142,7 +54,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/windows/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/windows/Dev/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -181,13 +93,13 @@ stages:
                 displayName: 'Extract Plan Artifact'
                 inputs:
                   archiveFilePatterns: '$(Pipeline.Workspace)/dev-windowsvm-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/windows/'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/windows/Dev/'
                   cleanDestinationFolder: false
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/windows/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/virtual_machine/windows/Dev/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
                   allowTelemetryCollection: false

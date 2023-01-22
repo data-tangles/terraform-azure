@@ -33,7 +33,7 @@ stages:
           inputs:
             backendType: 'azurerm'
             command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/Prod/'
             backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
             backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
             backendAzureRmStorageAccountName: 'stprodtfsan01'
@@ -45,7 +45,7 @@ stages:
           displayName: 'Prod Storage Terraform Plan'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/Prod/'
             commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/storage/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
             allowTelemetryCollection: false
@@ -54,7 +54,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/Prod/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -93,13 +93,13 @@ stages:
                 displayName: 'Extract Plan Artifact'
                 inputs:
                   archiveFilePatterns: '$(Pipeline.Workspace)/prod-storage-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/Prod/'
                   cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/storage_account/Prod/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
                   allowTelemetryCollection: false

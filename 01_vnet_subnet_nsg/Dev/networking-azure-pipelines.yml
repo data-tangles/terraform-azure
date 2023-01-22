@@ -38,7 +38,7 @@ stages:
           inputs:
             command: 'init'
             backendType: 'azurerm'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/Dev/'
             backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
             backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
             backendAzureRmStorageAccountName: 'stprodtfsan01'
@@ -50,7 +50,7 @@ stages:
           displayName: 'Dev Networking Terraform Plan'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/Dev/'
             commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
             allowTelemetryCollection: false
@@ -59,7 +59,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/Dev/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -98,13 +98,13 @@ stages:
                 displayName: 'Extract Plan Artifact'
                 inputs:
                   archiveFilePatterns: '$(Pipeline.Workspace)/dev-networking-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/Dev/'
                   cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/Dev/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
                   allowTelemetryCollection: false
