@@ -27,6 +27,16 @@ terraform {
 
 data "azurerm_client_config" "current" {}
 
+data "terraform_remote_state" "networking" {
+  backend = "azurerm"
+  config = {
+    key                  = "dev.networking.terraform.tfstate"
+    container_name       = "dev-tfstate"
+    resource_group_name  = "rg-storage-prod-san-01"
+    storage_account_name = "stprodtfsan01"
+  }
+}
+
 locals {
   common_tags = {
     environment = var.tag_environment
@@ -54,6 +64,6 @@ resource "azurerm_key_vault" "key_vault" {
   network_acls {
     bypass                     = "AzureServices"
     default_action             = "Deny"
-    virtual_network_subnet_ids = var.allowed_ip_list
+    virtual_network_subnet_ids = data.terraform_remote_state.networking.outputs.vm_snet_id
   }
 }

@@ -18,7 +18,3 @@ variable "kv_name" {
   description = "Name of the Key Vault"
 }
 
-variable "allowed_ip_list" {
-  type        = list(string)
-  description = "Allowed IP list"
-}

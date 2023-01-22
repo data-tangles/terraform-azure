@@ -26,8 +26,8 @@ data "terraform_remote_state" "networking" {
   config = {
     key                  = "dev.networking.terraform.tfstate"
     container_name       = "dev-tfstate"
-    resource_group_name  = "stprodtfsan01"
-    storage_account_name = "MyStorageAccount"
+    resource_group_name  = "rg-storage-prod-san-01"
+    storage_account_name = "stprodtfsan01"
   }
 }
 
