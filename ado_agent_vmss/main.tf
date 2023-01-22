@@ -57,6 +57,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "ado_vmss" {
   sku                 = var.vmss_size
   instances           = var.instances
   upgrade_mode        = "Manual"
+  disable_password_authentication = false
   admin_username      = var.vm_user
   admin_password      = random_password.password.result
   tags                = merge(local.common_tags)
