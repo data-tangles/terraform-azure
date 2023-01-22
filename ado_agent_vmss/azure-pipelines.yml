@@ -58,7 +58,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/ado_agent_vmss/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/ado_agent_vmss/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -97,13 +97,13 @@ stages:
                 displayName: 'Extract Plan Artifact'
                 inputs:
                   archiveFilePatterns: '$(Pipeline.Workspace)/prod-vmss-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/ado_agent_vmss/'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/ado_agent_vmss/'
                   cleanDestinationFolder: false
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/ado_agent_vmss/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/ado_agent_vmss/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
                   allowTelemetryCollection: false
