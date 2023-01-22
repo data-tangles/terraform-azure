@@ -64,6 +64,6 @@ resource "azurerm_key_vault" "key_vault" {
   network_acls {
     bypass                     = "AzureServices"
     default_action             = "Deny"
-    virtual_network_subnet_ids = data.terraform_remote_state.networking.outputs.vm_snet_id
+    virtual_network_subnet_ids = data.terraform_remote_state.networking.outputs.vm_snet_prefixes
   }
 }
