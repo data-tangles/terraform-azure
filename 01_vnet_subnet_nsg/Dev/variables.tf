@@ -19,7 +19,7 @@ variable "vnet_name" {
 }
 
 variable "vnet_address_space" {
-  type        = list(string)
+  type        = string
   description = "Address space of the Virtual Network"
 }
 
@@ -29,6 +29,6 @@ variable "vm_snet_name" {
 }
 
 variable "vm_snet_address_prefixes" {
-  type        = list(string)
+  type        = string
   description = "Address Prefix of the Subnet"
 }
