@@ -27,6 +27,11 @@ stages:
       steps:
         - checkout: self
         - checkout: TerraformVars
+
+        - task: TerraformInstaller@0
+          displayName: 'Terraform Install'
+          inputs:
+            terraformVersion: ${{ parameters.terraformVersion }}
         
         - task: TerraformCLI@0
           displayName: 'Dev Storage Terraform Init'
