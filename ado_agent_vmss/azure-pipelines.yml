@@ -98,7 +98,7 @@ stages:
                 inputs:
                   archiveFilePatterns: '$(Pipeline.Workspace)/prod-vmss-plan/$(Build.BuildNumber).tgz'
                   destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/ado_agent_vmss/'
-                  cleanDestinationFolder: false
+                  cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:

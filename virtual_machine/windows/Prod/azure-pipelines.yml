@@ -99,7 +99,7 @@ stages:
                 inputs:
                   archiveFilePatterns: '$(Pipeline.Workspace)/prod-windowsvm-plan/$(Build.BuildNumber).tgz'
                   destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/virtual_machine/windows/Prod/'
-                  cleanDestinationFolder: false
+                  cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:
