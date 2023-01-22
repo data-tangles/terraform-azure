@@ -40,7 +40,7 @@ stages:
             backendType: 'azurerm'
             workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg'
             backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
-            backendAzureRmResourceGroupName: 'rg-storage-dev-san-01'
+            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
             backendAzureRmStorageAccountName: 'stprodtfsan01'
             backendAzureRmContainerName: 'dev-tfstate'
             backendAzureRmKey: 'dev.networking.terraform.tfstate'
