@@ -60,6 +60,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "ado_vmss" {
   disable_password_authentication = false
   admin_username      = var.vm_user
   admin_password      = random_password.password.result
+  single_placement_group = false
   tags                = merge(local.common_tags)
 
   source_image_reference {
