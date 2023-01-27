@@ -51,17 +51,18 @@ resource "azurerm_resource_group" "ado_vmss_rg" {
 }
 
 resource "azurerm_linux_virtual_machine_scale_set" "ado_vmss" {
-  name                = var.ado_vmss_name
-  resource_group_name = azurerm_resource_group.ado_vmss_rg.name
-  location            = azurerm_resource_group.ado_vmss_rg.location
-  sku                 = var.vmss_size
-  instances           = var.instances
-  upgrade_mode        = "Manual"
+  name                            = var.ado_vmss_name
+  resource_group_name             = azurerm_resource_group.ado_vmss_rg.name
+  location                        = azurerm_resource_group.ado_vmss_rg.location
+  sku                             = var.vmss_size
+  instances                       = var.instances
+  overprovision                   = false
+  upgrade_mode                    = "Manual"
   disable_password_authentication = false
-  admin_username      = var.vm_user
-  admin_password      = random_password.password.result
-  single_placement_group = false
-  tags                = merge(local.common_tags)
+  admin_username                  = var.vm_user
+  admin_password                  = random_password.password.result
+  single_placement_group          = false
+  tags                            = merge(local.common_tags)
 
   source_image_reference {
     publisher = var.publisher
@@ -73,6 +74,9 @@ resource "azurerm_linux_virtual_machine_scale_set" "ado_vmss" {
   os_disk {
     storage_account_type = "Standard_LRS"
     caching              = "ReadWrite"
+    diff_disk_settings {
+      option = "Local"
+    }
   }
 
   network_interface {
