@@ -24,10 +24,5 @@ variable "sku" {
   default     = "Basic"
 }
 
-variable "ip_range" {
-  type        = string
-  description = "IP Range allowed to access the Azure Container Registry"
-}
-
 
 

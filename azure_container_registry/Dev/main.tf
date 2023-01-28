@@ -13,16 +13,6 @@ provider "azurerm" {
   features {}
 }
 
-data "terraform_remote_state" "networking" {
-  backend = "azurerm"
-  config = {
-    key                  = "dev.networking.terraform.tfstate"
-    container_name       = "dev-tfstate"
-    resource_group_name  = "rg-storage-prod-san-01"
-    storage_account_name = "stprodtfsan01"
-  }
-}
-
 locals {
   common_tags = {
     environment = var.tag_environment
@@ -45,15 +35,4 @@ resource "azurerm_container_registry" "acr" {
   admin_enabled                 = false
   public_network_access_enabled = false
   tags                          = merge(local.common_tags)
-  network_rule_set = [{
-    default_action = "Deny"
-    ip_rule = [{
-      action   = "Allow"
-      ip_range = var.ip_range
-    }]
-    virtual_network = [{
-      action    = "Allow"
-      subnet_id = data.terraform_remote_state.networking.outputs.aci_snet_id
-    }]
-  }]
 }
