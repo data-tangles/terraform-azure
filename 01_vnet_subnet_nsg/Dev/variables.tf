@@ -25,10 +25,21 @@ variable "vnet_address_space" {
 
 variable "vm_snet_name" {
   type        = string
-  description = "Name of the Subnet"
+  description = "Name of the VM Subnet"
 }
 
 variable "vm_snet_address_prefixes" {
   type        = list(string)
-  description = "Address Prefix of the Subnet"
+  description = "Address Prefix of VM the Subnet"
 }
+
+variable "aci_snet_name" {
+  type        = string
+  description = "Name of the ACI Subnet"
+}
+
+variable "aci_snet_address_prefixes" {
+  type        = list(string)
+  description = "Address Prefix of the ACI Subnet"
+}
+

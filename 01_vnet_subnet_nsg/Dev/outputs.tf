@@ -5,5 +5,10 @@ output "vnet_id" {
 
 output "vm_snet_id" {
   value       = azurerm_subnet.vm_subnet.id
-  description = "Outputs the subnet ID"
+  description = "Outputs the VM subnet ID"
+}
+
+output "aci_snet_id" {
+  value       = azurerm_subnet.aci_subnet.id
+  description = "Outputs the ACI subnet ID"
 }
