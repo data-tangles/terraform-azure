@@ -62,6 +62,8 @@ resource "azurerm_linux_virtual_machine_scale_set" "ado_vmss" {
   admin_username                  = var.vm_user
   admin_password                  = random_password.password.result
   single_placement_group          = false
+  priority                        = "Spot"
+  eviction_policy                 = "Deallocate"
   tags                            = merge(local.common_tags)
 
   source_image_reference {
