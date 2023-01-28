@@ -28,11 +28,9 @@ resource "azurerm_resource_group" "acr_rg" {
 }
 
 resource "azurerm_container_registry" "acr" {
-  name                          = var.acr_name
-  resource_group_name           = azurerm_resource_group.acr_rg.name
-  location                      = azurerm_resource_group.acr_rg.location
-  sku                           = var.sku
-  admin_enabled                 = false
-  public_network_access_enabled = false
-  tags                          = merge(local.common_tags)
+  name                = var.acr_name
+  resource_group_name = azurerm_resource_group.acr_rg.name
+  location            = azurerm_resource_group.acr_rg.location
+  sku                 = var.sku
+  tags                = merge(local.common_tags)
 }
