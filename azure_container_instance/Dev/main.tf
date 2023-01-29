@@ -57,6 +57,7 @@ resource "azurerm_container_group" "aci" {
   location            = azurerm_resource_group.aci_rg.location
   resource_group_name = azurerm_resource_group.aci_rg.name
   ip_address_type     = "Private"
+  subnet_ids          = data.terraform_remote_state.networking.outputs.aci_snet_id
   network_profile_id  = azurerm_network_profile.aci_np.id
   os_type             = "Linux"
 
