@@ -96,7 +96,7 @@ stages:
               - task: ExtractFiles@1
                 displayName: 'Extract Plan Artifact'
                 inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-acr-plan/$(Build.BuildNumber).tgz'
+                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-aci-plan/$(Build.BuildNumber).tgz'
                   destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/azure_container_instance/Dev/'
                   cleanDestinationFolder: true
 
