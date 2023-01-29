@@ -24,7 +24,6 @@ No modules.
 | Name | Type |
 |------|------|
 | [azurerm_container_group.aci](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/container_group) | resource |
-| [azurerm_network_profile.aci_np](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/network_profile) | resource |
 | [azurerm_resource_group.aci_rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/resource_group) | resource |
 | [terraform_remote_state.networking](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 

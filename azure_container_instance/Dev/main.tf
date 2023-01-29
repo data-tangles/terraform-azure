@@ -52,6 +52,9 @@ resource "azurerm_container_group" "aci" {
     memory       = "1.0"
     cpu_limit    = "1.0"
     memory_limit = "1.0"
+    ports {
+
+    }
     environment_variables = {
       "AZP_URL"        = var.azp_url
       "AZP_TOKEN"      = var.azp_token
