@@ -53,7 +53,8 @@ resource "azurerm_container_group" "aci" {
     cpu_limit    = "1.0"
     memory_limit = "1.0"
     ports {
-
+      port = 9998
+      protocol = "UDP"
     }
     environment_variables = {
       "AZP_URL"        = var.azp_url
