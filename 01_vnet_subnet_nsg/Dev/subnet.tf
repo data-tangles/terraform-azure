@@ -14,5 +14,13 @@ resource "azurerm_subnet" "aci_subnet" {
   address_prefixes     = var.aci_snet_address_prefixes
   depends_on           = [azurerm_virtual_network.vnet]
   service_endpoints    = ["Microsoft.KeyVault"]
+  delegation {
+    name = "delegation"
+
+    service_delegation {
+      name    = "Microsoft.ContainerInstance/containerGroups"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+    }
+  }
 }
 
