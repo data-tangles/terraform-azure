@@ -37,28 +37,12 @@ resource "azurerm_resource_group" "aci_rg" {
   tags     = merge(local.common_tags)
 }
 
-resource "azurerm_network_profile" "aci_np" {
-  name                = "${var.aci_name}-profile"
-  location            = azurerm_resource_group.aci_rg.location
-  resource_group_name = azurerm_resource_group.aci_rg.name
-
-  container_network_interface {
-    name = "${var.aci_name}-nic"
-
-    ip_configuration {
-      name      = "containeripconfig"
-      subnet_id = data.terraform_remote_state.networking.outputs.aci_snet_id
-    }
-  }
-}
-
 resource "azurerm_container_group" "aci" {
   name                = var.aci_name
   location            = azurerm_resource_group.aci_rg.location
   resource_group_name = azurerm_resource_group.aci_rg.name
   ip_address_type     = "Private"
-  subnet_ids          = data.terraform_remote_state.networking.outputs.aci_snet_id
-  network_profile_id  = azurerm_network_profile.aci_np.id
+  subnet_ids          = [data.terraform_remote_state.networking.outputs.aci_snet_id]
   os_type             = "Linux"
 
   container {
