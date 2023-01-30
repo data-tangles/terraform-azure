@@ -69,9 +69,9 @@ resource "azurerm_container_group" "aci" {
   os_type             = "Linux"
   depends_on          = [azurerm_role_assignment.aci_rbac]
 
-  image_registry_credential {
-    user_assigned_identity_id = azurerm_user_assigned_identity.aci_mi.id
-    server                    = var.acr_server_url
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.aci_mi.id]
   }
 
   container {
