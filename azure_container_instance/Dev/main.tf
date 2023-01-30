@@ -71,6 +71,7 @@ resource "azurerm_container_group" "aci" {
 
   image_registry_credential {
     user_assigned_identity_id = azurerm_user_assigned_identity.aci_mi.id
+    server = data.terraform_remote_state.acr.outputs.acr_id
   }
 
   container {
