@@ -47,17 +47,11 @@ resource "azurerm_resource_group" "aci_rg" {
   tags     = merge(local.common_tags)
 }
 
-resource "azurerm_user_assigned_identity" "aci_mi" {
-  location            = azurerm_resource_group.aci_rg.location
-  name                = "${var.aci_name}-mi"
-  resource_group_name = azurerm_resource_group.aci_rg.name
-}
-
 resource "azurerm_role_assignment" "aci_rbac" {
   scope                = data.terraform_remote_state.acr.outputs.acr_id
   role_definition_name = "AcrPull"
-  principal_id         = azurerm_user_assigned_identity.aci_mi.id
-  depends_on           = [azurerm_user_assigned_identity.aci_mi]
+  principal_id         = azurerm_container_group.aci.id
+  depends_on           = [azurerm_container_group.aci]
 }
 
 resource "azurerm_container_group" "aci" {
@@ -67,7 +61,10 @@ resource "azurerm_container_group" "aci" {
   ip_address_type     = "Private"
   subnet_ids          = [data.terraform_remote_state.networking.outputs.aci_snet_id]
   os_type             = "Linux"
-  depends_on          = [azurerm_role_assignment.aci_rbac]
+
+  identity {
+    type = "SystemAssigned"
+  }
 
   container {
     name         = var.container_name
