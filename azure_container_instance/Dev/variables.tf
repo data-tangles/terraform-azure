@@ -28,6 +28,11 @@ variable "container_image" {
   description = "Image of the Container"
 }
 
+variable "acr_server_url" {
+  type        = string
+  description = "Server URL for the ACR"
+}
+
 variable "azp_url" {
   type        = string
   description = "Azure DevOps URL"
