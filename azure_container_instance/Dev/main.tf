@@ -23,6 +23,16 @@ data "terraform_remote_state" "networking" {
   }
 }
 
+data "terraform_remote_state" "acr" {
+  backend = "azurerm"
+  config = {
+    key                  = "dev.acr.terraform.tfstate"
+    container_name       = "dev-tfstate"
+    resource_group_name  = "rg-storage-prod-san-01"
+    storage_account_name = "stprodtfsan01"
+  }
+}
+
 locals {
   common_tags = {
     environment = var.tag_environment
@@ -37,6 +47,19 @@ resource "azurerm_resource_group" "aci_rg" {
   tags     = merge(local.common_tags)
 }
 
+resource "azurerm_user_assigned_identity" "aci_mi" {
+  location            = azurerm_resource_group.aci_rg.location
+  name                = "${var.aci_name}-mi"
+  resource_group_name = azurerm_resource_group.aci_rg.name
+}
+
+resource "azurerm_role_assignment" "aci_rbac" {
+  scope                = data.terraform_remote_state.acr.outputs.acr_id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_user_assigned_identity.aci_mi.id
+  depends_on           = [azurerm_user_assigned_identity.aci_mi]
+}
+
 resource "azurerm_container_group" "aci" {
   name                = var.aci_name
   location            = azurerm_resource_group.aci_rg.location
@@ -44,6 +67,7 @@ resource "azurerm_container_group" "aci" {
   ip_address_type     = "Private"
   subnet_ids          = [data.terraform_remote_state.networking.outputs.aci_snet_id]
   os_type             = "Linux"
+  depends_on          = [azurerm_role_assignment.aci_rbac]
 
   container {
     name         = var.container_name
@@ -53,7 +77,7 @@ resource "azurerm_container_group" "aci" {
     cpu_limit    = "1.0"
     memory_limit = "1.0"
     ports {
-      port = 9998
+      port     = 9998
       protocol = "UDP"
     }
     environment_variables = {

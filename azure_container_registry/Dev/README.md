@@ -37,5 +37,7 @@ No modules.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_acr_id"></a> [acr\_id](#output\_acr\_id) | Outputs the ACR ID |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
