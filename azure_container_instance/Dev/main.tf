@@ -48,8 +48,8 @@ resource "azurerm_resource_group" "aci_rg" {
 }
 
 resource "azurerm_user_assigned_identity" "aci_mi" {
-  name = "${var.aci_name}-mi"
-  location = azurerm_resource_group.aci_rg.location
+  name                = "${var.aci_name}-mi"
+  location            = azurerm_resource_group.aci_rg.location
   resource_group_name = azurerm_resource_group.aci_rg.name
 }
 
@@ -71,7 +71,7 @@ resource "azurerm_container_group" "aci" {
 
   image_registry_credential {
     user_assigned_identity_id = azurerm_user_assigned_identity.aci_mi.id
-    server = data.terraform_remote_state.acr.outputs.acr_id
+    server                    = var.acr_server_url
   }
 
   container {

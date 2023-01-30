@@ -18,6 +18,11 @@ variable "aci_name" {
   description = "Name of the ACI"
 }
 
+variable "acr_server_url" {
+  type        = string
+  description = "Server URL of the ACR"
+}
+
 variable "container_name" {
   type        = string
   description = "Name of the Container"

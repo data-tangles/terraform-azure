@@ -26,6 +26,7 @@ No modules.
 | [azurerm_container_group.aci](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/container_group) | resource |
 | [azurerm_resource_group.aci_rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/resource_group) | resource |
 | [azurerm_role_assignment.aci_rbac](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/role_assignment) | resource |
+| [azurerm_user_assigned_identity.aci_mi](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/user_assigned_identity) | resource |
 | [terraform_remote_state.acr](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 | [terraform_remote_state.networking](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 
@@ -34,6 +35,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_aci_name"></a> [aci\_name](#input\_aci\_name) | Name of the ACI | `string` | n/a | yes |
+| <a name="input_acr_server_url"></a> [acr\_server\_url](#input\_acr\_server\_url) | Server URL of the ACR | `string` | n/a | yes |
 | <a name="input_azp_token"></a> [azp\_token](#input\_azp\_token) | Azure DevOps PAT | `string` | n/a | yes |
 | <a name="input_azp_url"></a> [azp\_url](#input\_azp\_url) | Azure DevOps URL | `string` | n/a | yes |
 | <a name="input_container_image"></a> [container\_image](#input\_container\_image) | Image of the Container | `string` | n/a | yes |
