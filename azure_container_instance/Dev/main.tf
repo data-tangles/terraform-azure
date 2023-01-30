@@ -94,6 +94,7 @@ resource "azurerm_container_group" "aci" {
       "AZP_URL"        = var.azp_url
       "AZP_TOKEN"      = var.azp_token
       "AZP_AGENT_NAME" = var.container_name
+      "AZP_POOL"       = "dev-ado-agents"
     }
   }
 }
