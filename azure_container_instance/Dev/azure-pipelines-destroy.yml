@@ -42,7 +42,7 @@ stages:
             backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
             backendAzureRmStorageAccountName: 'stprodtfsan01'
             backendAzureRmContainerName: 'dev-tfstate'
-            backendAzureRmKey: 'dev.acr.terraform.tfstate'
+            backendAzureRmKey: 'dev.aci.terraform.tfstate'
             allowTelemetryCollection: false
 
         - task: TerraformCLI@0
