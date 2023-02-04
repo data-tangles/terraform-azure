@@ -22,7 +22,7 @@ stages:
   jobs:          
     - job: 'TerraformInitPlan_KeyVault'
       displayName: 'Initialize and Plan Terraform for Dev Environment Key Vault'
-      pool: 'Dev VMSS'
+      pool: 'dev-ado-agents'
       
       steps:
         - checkout: self
@@ -80,7 +80,7 @@ stages:
   jobs:          
     - deployment: 'TerraformApply_KeyVault'
       displayName: 'Apply Terraform for Dev Environment Key Vault'
-      pool: 'Dev VMSS'
+      pool: 'dev-ado-agents'
       environment: Dev
       strategy:
         runOnce:
