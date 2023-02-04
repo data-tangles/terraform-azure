@@ -43,3 +43,13 @@ variable "aci_snet_address_prefixes" {
   description = "Address Prefix of the ACI Subnet"
 }
 
+variable "avd_snet_name" {
+  type        = string
+  description = "Name of the AVD Subnet"
+}
+
+variable "avd_snet_address_prefixes" {
+  type        = list(string)
+  description = "Address Prefix of the AVD Subnet"
+}
+

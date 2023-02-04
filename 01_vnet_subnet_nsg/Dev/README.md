@@ -23,11 +23,14 @@ No modules.
 | Name | Type |
 |------|------|
 | [azurerm_network_security_group.aci_snet_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_group.avd_snet_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/network_security_group) | resource |
 | [azurerm_network_security_group.vm_snet_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/network_security_group) | resource |
 | [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/resource_group) | resource |
 | [azurerm_subnet.aci_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/subnet) | resource |
+| [azurerm_subnet.avd_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/subnet) | resource |
 | [azurerm_subnet.vm_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/subnet) | resource |
 | [azurerm_subnet_network_security_group_association.aci_snet_nsg_asc](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/subnet_network_security_group_association) | resource |
+| [azurerm_subnet_network_security_group_association.avd_snet_nsg_asc](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/subnet_network_security_group_association) | resource |
 | [azurerm_subnet_network_security_group_association.vm_snet_nsg_asc](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/subnet_network_security_group_association) | resource |
 | [azurerm_virtual_network.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/virtual_network) | resource |
 
@@ -37,6 +40,8 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_aci_snet_address_prefixes"></a> [aci\_snet\_address\_prefixes](#input\_aci\_snet\_address\_prefixes) | Address Prefix of the ACI Subnet | `list(string)` | n/a | yes |
 | <a name="input_aci_snet_name"></a> [aci\_snet\_name](#input\_aci\_snet\_name) | Name of the ACI Subnet | `string` | n/a | yes |
+| <a name="input_avd_snet_address_prefixes"></a> [avd\_snet\_address\_prefixes](#input\_avd\_snet\_address\_prefixes) | Address Prefix of the AVD Subnet | `list(string)` | n/a | yes |
+| <a name="input_avd_snet_name"></a> [avd\_snet\_name](#input\_avd\_snet\_name) | Name of the AVD Subnet | `string` | n/a | yes |
 | <a name="input_rg_location"></a> [rg\_location](#input\_rg\_location) | Location of the Resource Group | `string` | n/a | yes |
 | <a name="input_rg_name"></a> [rg\_name](#input\_rg\_name) | Name of the Resource Group | `string` | n/a | yes |
 | <a name="input_tag_environment"></a> [tag\_environment](#input\_tag\_environment) | Tag Value for Environment | `string` | n/a | yes |
