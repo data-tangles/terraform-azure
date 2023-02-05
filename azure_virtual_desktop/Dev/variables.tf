@@ -22,3 +22,8 @@ variable "app_group_name" {
   type        = string
   description = "Name of the Application Group"
 }
+
+variable "avd_sig_name" {
+  type        = string
+  description = "Name of the AVD Shared Image Gallery"
+}
