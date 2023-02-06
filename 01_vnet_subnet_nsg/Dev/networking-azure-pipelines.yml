@@ -1,3 +1,6 @@
+variables:
+  - group: terraform-azure-dev
+
 resources:
   repositories:
     - repository: 'TerraformVars'
@@ -39,9 +42,9 @@ stages:
             command: 'init'
             backendType: 'azurerm'
             workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/01_vnet_subnet_nsg/Dev/'
-            backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
-            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
-            backendAzureRmStorageAccountName: 'stprodtfsan01'
+            backendServiceArm: '$(backendServiceArm)'
+            backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
+            backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
             backendAzureRmContainerName: 'dev-tfstate'
             backendAzureRmKey: 'dev.networking.terraform.tfstate'
             allowTelemetryCollection: false
