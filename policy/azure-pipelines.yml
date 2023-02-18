@@ -1,0 +1,98 @@
+parameters:
+  - name: terraformVersion
+    type: string
+    default: 'latest'
+
+trigger:
+- none
+
+stages:
+
+- stage: 'PolicyPlan'
+  dependsOn: []
+  displayName: Policy Plan
+
+  jobs:          
+    - job: 'TerraformInitPlan_Policy'
+      displayName: 'Initialize and Plan Terraform for Policy'
+      pool: 'Azure Pipelines'
+      steps:
+
+        - task: TerraformInstaller@0
+          displayName: 'Terraform Install'
+          inputs:
+            terraformVersion: ${{ parameters.terraformVersion }}
+
+        - task: TerraformCLI@0
+          displayName: 'Policy Terraform Init'
+          inputs:
+            backendType: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/policy/'
+            backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
+            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
+            backendAzureRmStorageAccountName: 'stprodtfsan01'
+            backendAzureRmContainerName: 'prod-tfstate'
+            backendAzureRmKey: 'prod.policy.terraform.tfstate'
+            allowTelemetryCollection: false
+
+        - task: TerraformCLI@0
+          displayName: 'Policy Terraform Plan'
+          inputs:
+            command: 'plan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/policy/'
+            commandOptions: '-out ${BUILD_BUILDNUMBER}.tfplan'
+            environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
+            allowTelemetryCollection: false
+
+        - task: ArchiveFiles@2
+          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+          displayName: 'Create Plan Artifact'
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/policy/'
+            includeRootFolder: false
+            archiveType: 'tar'
+            tarCompression: 'gz'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
+            replaceExistingArchive: true
+            
+        - task: PublishPipelineArtifact@1
+          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+          displayName: 'Publish Plan Artifact'
+          inputs:
+            targetPath: '$(Build.ArtifactStagingDirectory)'
+            artifactName: 'policy-plan'
+            
+- stage: 'PolicyApply'
+  dependsOn: 'PolicyPlan'
+  displayName: Policy Apply
+  
+  jobs:          
+    - deployment: 'TerraformApply_Policy'
+      displayName: 'Apply Terraform for Policy'
+      pool: 'Azure Pipelines'
+      environment: Prod
+      strategy:
+        runOnce:
+          deploy:     
+            steps:
+
+              - task: TerraformInstaller@0
+                displayName: 'Terraform Install'
+                inputs:
+                  terraformVersion: ${{ parameters.terraformVersion }}
+
+              - task: ExtractFiles@1
+                displayName: 'Extract Plan Artifact'
+                inputs:
+                  archiveFilePatterns: '$(Pipeline.Workspace)/policy-plan/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/policy/'
+                  cleanDestinationFolder: true
+
+              - task: TerraformCLI@0
+                inputs:
+                  command: 'apply'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/policy/'
+                  commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
+                  environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
+                  allowTelemetryCollection: false
