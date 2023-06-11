@@ -30,6 +30,13 @@ resource "azurerm_resource_group" "rg" {
   tags     = merge(local.common_tags)
 }
 
+resource "azurerm_management_lock" "veeam_rg_lock" {
+  name       = "PreventDelete"
+  scope      = azurerm_resource_group.rg.id
+  lock_level = "CanNotDelete"
+  notes      = "Prevent deletion of backup resources"
+}
+
 resource "azurerm_storage_account" "veeam_backup" {
   name                     = var.veeam_sa_name
   resource_group_name      = azurerm_resource_group.rg.name
