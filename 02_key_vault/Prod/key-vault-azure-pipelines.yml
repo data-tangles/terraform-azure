@@ -1,3 +1,6 @@
+variables:
+  - group: terraform-azure-prod
+
 resources:
   repositories:
     - repository: 'TerraformVars'
@@ -39,9 +42,9 @@ stages:
             command: 'init'
             backendType: 'azurerm'
             workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/02_key_vault/Prod//'
-            backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
-            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
-            backendAzureRmStorageAccountName: 'stprodtfsan01'
+            backendServiceArm: '$(backendServiceArm)'
+            backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
+            backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
             backendAzureRmContainerName: 'prod-tfstate'
             backendAzureRmKey: 'prod.keyvault.terraform.tfstate'
             allowTelemetryCollection: false
