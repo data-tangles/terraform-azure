@@ -6,15 +6,15 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 3.34.0 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | 3.4.3 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 3.60.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | 3.5.1 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.34.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.60.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.5.1 |
 | <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
 ## Modules
@@ -25,11 +25,11 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_key_vault.key_vault](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/key_vault) | resource |
-| [azurerm_key_vault_secret.vmpassword](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/key_vault_secret) | resource |
-| [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/resource_group) | resource |
-| [random_password.vmpassword](https://registry.terraform.io/providers/hashicorp/random/3.4.3/docs/resources/password) | resource |
-| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/data-sources/client_config) | data source |
+| [azurerm_key_vault.key_vault](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/key_vault) | resource |
+| [azurerm_key_vault_secret.vmpassword](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/key_vault_secret) | resource |
+| [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/resource_group) | resource |
+| [random_password.vmpassword](https://registry.terraform.io/providers/hashicorp/random/3.5.1/docs/resources/password) | resource |
+| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/data-sources/client_config) | data source |
 | [terraform_remote_state.networking](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 
 ## Inputs

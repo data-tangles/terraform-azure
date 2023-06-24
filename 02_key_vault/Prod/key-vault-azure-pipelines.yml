@@ -55,7 +55,7 @@ stages:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/02_key_vault/Prod//'
             commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/key_vault/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
-            environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
+            environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
         - task: ArchiveFiles@2

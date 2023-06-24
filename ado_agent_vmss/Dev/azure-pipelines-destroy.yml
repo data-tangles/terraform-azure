@@ -38,9 +38,9 @@ stages:
             backendType: 'azurerm'
             command: 'init'
             workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/ado_agent_vmss/Dev/'
-            backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
-            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
-            backendAzureRmStorageAccountName: 'stprodtfsan01'
+            backendServiceArm: '$(backendServiceArm)'
+            backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
+            backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
             backendAzureRmContainerName: 'dev-tfstate'
             backendAzureRmKey: 'dev.virtualmachines.terraform.tfstate'
             allowTelemetryCollection: false
@@ -51,7 +51,7 @@ stages:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/ado_agent_vmss/Dev/'
             commandOptions: '-destroy -var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/ado_agent_vmss/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
-            environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
+            environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
         - task: ArchiveFiles@2

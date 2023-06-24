@@ -6,13 +6,13 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 3.34.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 3.60.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.34.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.60.0 |
 
 ## Modules
 
@@ -22,10 +22,10 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/resource_group) | resource |
-| [azurerm_shared_image_gallery.avd_sig](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/shared_image_gallery) | resource |
-| [azurerm_virtual_desktop_application_group.desktop_ag](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/virtual_desktop_application_group) | resource |
-| [azurerm_virtual_desktop_host_pool.pooled_hp](https://registry.terraform.io/providers/hashicorp/azurerm/3.34.0/docs/resources/virtual_desktop_host_pool) | resource |
+| [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/resource_group) | resource |
+| [azurerm_shared_image_gallery.avd_sig](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/shared_image_gallery) | resource |
+| [azurerm_virtual_desktop_application_group.desktop_ag](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/virtual_desktop_application_group) | resource |
+| [azurerm_virtual_desktop_host_pool.pooled_hp](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/virtual_desktop_host_pool) | resource |
 
 ## Inputs
 

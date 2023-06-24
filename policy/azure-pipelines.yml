@@ -29,9 +29,9 @@ stages:
             backendType: 'azurerm'
             command: 'init'
             workingDirectory: '$(System.DefaultWorkingDirectory)/policy/'
-            backendServiceArm: 'Visual Studio Enterprise Subscription - MPN'
-            backendAzureRmResourceGroupName: 'rg-storage-prod-san-01'
-            backendAzureRmStorageAccountName: 'stprodtfsan01'
+            backendServiceArm: '$(backendServiceArm)'
+            backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
+            backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
             backendAzureRmContainerName: 'prod-tfstate'
             backendAzureRmKey: 'prod.policy.terraform.tfstate'
             allowTelemetryCollection: false
@@ -42,7 +42,7 @@ stages:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/policy/'
             commandOptions: '-out ${BUILD_BUILDNUMBER}.tfplan'
-            environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
+            environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
         - task: ArchiveFiles@2
