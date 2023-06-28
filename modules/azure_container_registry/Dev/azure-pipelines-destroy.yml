@@ -1,3 +1,6 @@
+variables:
+- group: terraform-azure-dev 
+
 resources:
   repositories:
     - repository: 'TerraformVars'
@@ -51,7 +54,7 @@ stages:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_registry/Dev/'
             commandOptions: '-destroy -var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/azure_container_registry/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
-            environmentServiceName: '$(environmentServiceName)'
+            environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
         - task: ArchiveFiles@2
@@ -105,5 +108,5 @@ stages:
                   command: 'apply'
                   workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_registry/Dev/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
-                  environmentServiceName: '$(environmentServiceName)'
+                  environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false
