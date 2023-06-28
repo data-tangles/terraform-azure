@@ -10,3 +10,12 @@
 # Terraform Azure
 
 This repo contains various Terraform modules for common services in Azure. 
+
+## 📂 Repository structure
+
+The Git repository contains the following directories:
+
+```sh
+📁 modules # these are common Azure Terraform Modules
+📁 production # these are modules specific to my own environment
+```

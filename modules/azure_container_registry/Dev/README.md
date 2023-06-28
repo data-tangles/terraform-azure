@@ -6,13 +6,13 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 3.60.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 3.62.1 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.60.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.62.1 |
 
 ## Modules
 
@@ -22,8 +22,8 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_container_registry.acr](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/container_registry) | resource |
-| [azurerm_resource_group.acr_rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/resource_group) | resource |
+| [azurerm_container_registry.acr](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/container_registry) | resource |
+| [azurerm_resource_group.acr_rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/resource_group) | resource |
 
 ## Inputs
 

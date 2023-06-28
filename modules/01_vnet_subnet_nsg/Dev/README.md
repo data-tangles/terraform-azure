@@ -6,13 +6,13 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 3.60.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 3.62.1 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.60.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.62.1 |
 
 ## Modules
 
@@ -22,17 +22,17 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_network_security_group.aci_snet_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/network_security_group) | resource |
-| [azurerm_network_security_group.avd_snet_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/network_security_group) | resource |
-| [azurerm_network_security_group.vm_snet_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/network_security_group) | resource |
-| [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/resource_group) | resource |
-| [azurerm_subnet.aci_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/subnet) | resource |
-| [azurerm_subnet.avd_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/subnet) | resource |
-| [azurerm_subnet.vm_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/subnet) | resource |
-| [azurerm_subnet_network_security_group_association.aci_snet_nsg_asc](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/subnet_network_security_group_association) | resource |
-| [azurerm_subnet_network_security_group_association.avd_snet_nsg_asc](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/subnet_network_security_group_association) | resource |
-| [azurerm_subnet_network_security_group_association.vm_snet_nsg_asc](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/subnet_network_security_group_association) | resource |
-| [azurerm_virtual_network.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/3.60.0/docs/resources/virtual_network) | resource |
+| [azurerm_network_security_group.aci_snet_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_group.avd_snet_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_group.vm_snet_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/network_security_group) | resource |
+| [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/resource_group) | resource |
+| [azurerm_subnet.aci_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/subnet) | resource |
+| [azurerm_subnet.avd_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/subnet) | resource |
+| [azurerm_subnet.vm_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/subnet) | resource |
+| [azurerm_subnet_network_security_group_association.aci_snet_nsg_asc](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/subnet_network_security_group_association) | resource |
+| [azurerm_subnet_network_security_group_association.avd_snet_nsg_asc](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/subnet_network_security_group_association) | resource |
+| [azurerm_subnet_network_security_group_association.vm_snet_nsg_asc](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/subnet_network_security_group_association) | resource |
+| [azurerm_virtual_network.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/virtual_network) | resource |
 
 ## Inputs
 

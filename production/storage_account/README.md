@@ -22,6 +22,7 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [azurerm_management_lock.veeam_rg_lock](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/management_lock) | resource |
 | [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/resource_group) | resource |
 | [azurerm_storage_account.veeam_backup](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/storage_account) | resource |
 | [azurerm_storage_account_network_rules.veeam_backup_sa_nr](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/storage_account_network_rules) | resource |
