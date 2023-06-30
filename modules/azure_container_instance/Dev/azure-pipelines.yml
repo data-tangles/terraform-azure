@@ -1,3 +1,6 @@
+variables:
+- group: terraform-azure
+
 resources:
   repositories:
     - repository: 'TerraformVars'
