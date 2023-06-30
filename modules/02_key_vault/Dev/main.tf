@@ -1,30 +1,3 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "3.62.1"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "3.5.1"
-    }
-  }
-  backend "azurerm" {}
-}
-
-provider "azurerm" {
-  features {
-    key_vault {
-      purge_soft_delete_on_destroy    = true
-      recover_soft_deleted_key_vaults = true
-    }
-  }
-}
-
-terraform {
-  required_version = ">= 1.0"
-}
-
 data "azurerm_client_config" "current" {}
 
 data "terraform_remote_state" "networking" {
@@ -37,19 +10,15 @@ data "terraform_remote_state" "networking" {
   }
 }
 
-locals {
-  common_tags = {
-    environment = var.tag_environment
-    createdby   = "Terraform"
-    createdon   = formatdate("DD-MM-YYYY hh:mm ZZZ", timestamp())
-  }
-}
-
 resource "azurerm_resource_group" "rg" {
   name     = var.rg_name
   location = var.rg_location
 
   tags = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = ["tags.createdon"]
+  }
 }
 
 resource "azurerm_key_vault" "key_vault" {
@@ -62,6 +31,11 @@ resource "azurerm_key_vault" "key_vault" {
   purge_protection_enabled    = true
   sku_name                    = "standard"
   tags                        = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = ["tags.createdon"]
+  }
+  
   network_acls {
     bypass                     = "AzureServices"
     default_action             = "Deny"

@@ -45,7 +45,7 @@ stages:
             backendServiceArm: '$(backendServiceArm)'
             backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
             backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
-            backendAzureRmContainerName: 'prod-tfstate'
+            backendAzureRmContainerName: '$(backendAzureRmStorageAccountName)'
             backendAzureRmKey: 'prod.storage.terraform.tfstate'
             allowTelemetryCollection: false
 

@@ -3,6 +3,10 @@ resource "azurerm_network_security_group" "vm_snet_nsg" {
   name                = "${var.vm_snet_name}-nsg"
   resource_group_name = azurerm_resource_group.rg.name
   tags                = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = ["tags.createdon"]
+  }
 }
 
 resource "azurerm_subnet_network_security_group_association" "vm_snet_nsg_asc" {
@@ -16,6 +20,10 @@ resource "azurerm_network_security_group" "aci_snet_nsg" {
   name                = "${var.aci_snet_name}-nsg"
   resource_group_name = azurerm_resource_group.rg.name
   tags                = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = ["tags.createdon"]
+  }
 }
 
 resource "azurerm_subnet_network_security_group_association" "aci_snet_nsg_asc" {
@@ -29,6 +37,10 @@ resource "azurerm_network_security_group" "avd_snet_nsg" {
   name                = "${var.avd_snet_name}-nsg"
   resource_group_name = azurerm_resource_group.rg.name
   tags                = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = ["tags.createdon"]
+  }
 }
 
 resource "azurerm_subnet_network_security_group_association" "avd_snet_nsg_asc" {

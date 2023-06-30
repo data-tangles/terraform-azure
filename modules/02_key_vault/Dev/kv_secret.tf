@@ -10,4 +10,9 @@ resource "azurerm_key_vault_secret" "vmpassword" {
   content_type    = "password"
   expiration_date = timeadd(timestamp(), "2160h")
   depends_on      = [azurerm_key_vault.key_vault]
+  tags = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = ["tags.createdon"]
+  }
 }
