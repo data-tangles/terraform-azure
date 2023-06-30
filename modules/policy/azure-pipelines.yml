@@ -97,5 +97,5 @@ stages:
                   command: 'apply'
                   workingDirectory: '$(System.DefaultWorkingDirectory)/policy/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
-                  environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
+                  environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false

@@ -108,5 +108,5 @@ stages:
                   command: 'apply'
                   workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/virtual_machine/linux/Prod/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
-                  environmentServiceName: 'Visual Studio Enterprise Subscription - MPN'
+                  environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false
