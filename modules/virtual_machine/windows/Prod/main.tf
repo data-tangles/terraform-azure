@@ -1,21 +1,3 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "3.63.0"
-    }
-  }
-  backend "azurerm" {}
-}
-
-provider "azurerm" {
-  features {}
-}
-
-terraform {
-  required_version = ">= 1.0"
-}
-
 data "azurerm_key_vault_secret" "vmpassword" {
   name         = "vmpassword"
   key_vault_id = var.kv_uri
@@ -24,18 +6,10 @@ data "azurerm_key_vault_secret" "vmpassword" {
 data "terraform_remote_state" "networking" {
   backend = "azurerm"
   config = {
-    key                  = "prod.networking.terraform.tfstate"
-    container_name       = "prod-tfstate"
+    key                  = "dev.networking.terraform.tfstate"
+    container_name       = "dev-tfstate"
     resource_group_name  = "rg-storage-prod-san-01"
     storage_account_name = "stprodtfsan01"
-  }
-}
-
-locals {
-  common_tags = {
-    environment = var.tag_environment
-    createdby   = "Terraform"
-    createdon   = formatdate("DD-MM-YYYY hh:mm ZZZ", timestamp())
   }
 }
 
@@ -43,6 +17,10 @@ resource "azurerm_resource_group" "windows_vm_rg" {
   name     = var.rg_name
   location = var.rg_location
   tags     = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = [tags.createdon]
+  }
 }
 
 resource "azurerm_network_interface" "vm_nic" {
@@ -50,6 +28,10 @@ resource "azurerm_network_interface" "vm_nic" {
   location            = azurerm_resource_group.windows_vm_rg.location
   resource_group_name = azurerm_resource_group.windows_vm_rg.name
   tags                = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = [tags.createdon]
+  }
 
   ip_configuration {
     name                          = "internal"
@@ -66,6 +48,11 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
   admin_username      = var.vm_user
   admin_password      = data.azurerm_key_vault_secret.vmpassword.value
   tags                = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = [tags.createdon]
+  }
+
   network_interface_ids = [
     azurerm_network_interface.vm_nic.id,
   ]

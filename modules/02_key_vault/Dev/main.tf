@@ -17,7 +17,7 @@ resource "azurerm_resource_group" "rg" {
   tags = merge(local.common_tags)
 
   lifecycle {
-    ignore_changes = ["tags.createdon"]
+    ignore_changes = [tags.createdon]
   }
 }
 
@@ -33,9 +33,9 @@ resource "azurerm_key_vault" "key_vault" {
   tags                        = merge(local.common_tags)
 
   lifecycle {
-    ignore_changes = ["tags.createdon"]
+    ignore_changes = [tags.createdon]
   }
-  
+
   network_acls {
     bypass                     = "AzureServices"
     default_action             = "Deny"

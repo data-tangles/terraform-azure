@@ -1,25 +1,3 @@
-terraform {
-  required_version = ">= 1.0"
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "3.63.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "3.5.1"
-    }
-  }
-  backend "azurerm" {}
-}
-
-provider "azurerm" {
-  features {}
-}
-
-provider "random" {
-}
-
 data "terraform_remote_state" "networking" {
   backend = "azurerm"
   config = {
@@ -27,14 +5,6 @@ data "terraform_remote_state" "networking" {
     container_name       = "dev-tfstate"
     resource_group_name  = "rg-storage-prod-san-01"
     storage_account_name = "stprodtfsan01"
-  }
-}
-
-locals {
-  common_tags = {
-    environment = var.tag_environment
-    createdby   = "Terraform"
-    createdon   = formatdate("DD-MM-YYYY hh:mm ZZZ", timestamp())
   }
 }
 
@@ -48,6 +18,10 @@ resource "azurerm_resource_group" "ado_vmss_rg" {
   name     = var.rg_name
   location = var.rg_location
   tags     = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = [tags.createdon]
+  }
 }
 
 resource "azurerm_linux_virtual_machine_scale_set" "ado_vmss" {
@@ -63,6 +37,10 @@ resource "azurerm_linux_virtual_machine_scale_set" "ado_vmss" {
   admin_password                  = random_password.password.result
   single_placement_group          = false
   tags                            = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = [tags.createdon]
+  }
 
   source_image_reference {
     publisher = var.publisher

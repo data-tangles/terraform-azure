@@ -1,28 +1,4 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "3.63.0"
-    }
-  }
-  backend "azurerm" {}
-}
 
-provider "azurerm" {
-  features {}
-}
-
-terraform {
-  required_version = ">= 1.0"
-}
-
-locals {
-  common_tags = {
-    environment = var.tag_environment
-    createdby   = "Terraform"
-    createdon   = formatdate("DD-MM-YYYY hh:mm ZZZ", timestamp())
-  }
-}
 
 resource "azurerm_resource_group" "rg" {
   name     = var.rg_name
@@ -38,6 +14,10 @@ resource "azurerm_virtual_desktop_host_pool" "pooled_hp" {
   type               = "Pooled"
   load_balancer_type = "BreadthFirst"
   tags               = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = [tags.createdon]
+  }
 }
 
 resource "azurerm_virtual_desktop_application_group" "desktop_ag" {
@@ -50,6 +30,10 @@ resource "azurerm_virtual_desktop_application_group" "desktop_ag" {
   friendly_name = var.app_group_name
   description   = var.app_group_name
   tags          = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = [tags.createdon]
+  }
 }
 
 resource "azurerm_shared_image_gallery" "avd_sig" {
@@ -58,5 +42,9 @@ resource "azurerm_shared_image_gallery" "avd_sig" {
   location            = azurerm_resource_group.rg.location
   description         = "Azure Virtual Desktop Images"
   tags                = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = [tags.createdon]
+  }
 }
 

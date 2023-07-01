@@ -6,13 +6,13 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 3.62.1 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 3.63.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.62.1 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.63.0 |
 
 ## Modules
 
@@ -22,10 +22,10 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/resource_group) | resource |
-| [azurerm_storage_account.veeam_backup](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/storage_account) | resource |
-| [azurerm_storage_account_network_rules.veeam_backup_sa_nr](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/storage_account_network_rules) | resource |
-| [azurerm_storage_share.veeam_backup_fs](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/storage_share) | resource |
+| [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.63.0/docs/resources/resource_group) | resource |
+| [azurerm_storage_account.storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/3.63.0/docs/resources/storage_account) | resource |
+| [azurerm_storage_account_network_rules.storage_account_network_rules](https://registry.terraform.io/providers/hashicorp/azurerm/3.63.0/docs/resources/storage_account_network_rules) | resource |
+| [azurerm_storage_share.storage_account_share](https://registry.terraform.io/providers/hashicorp/azurerm/3.63.0/docs/resources/storage_share) | resource |
 
 ## Inputs
 
@@ -41,8 +41,8 @@ No modules.
 | <a name="input_fs_quota"></a> [fs\_quota](#input\_fs\_quota) | Quota for File Share | `string` | n/a | yes |
 | <a name="input_rg_location"></a> [rg\_location](#input\_rg\_location) | Location of the Resource Group | `string` | n/a | yes |
 | <a name="input_rg_name"></a> [rg\_name](#input\_rg\_name) | Name of the Resource Group | `string` | n/a | yes |
+| <a name="input_storage_account_name"></a> [storage\_account\_name](#input\_storage\_account\_name) | Name of the Storage Account | `string` | n/a | yes |
 | <a name="input_tag_environment"></a> [tag\_environment](#input\_tag\_environment) | Tag Value for Environment | `string` | n/a | yes |
-| <a name="input_veeam_sa_name"></a> [veeam\_sa\_name](#input\_veeam\_sa\_name) | Name of the Veeam Storage Account | `string` | n/a | yes |
 
 ## Outputs
 

@@ -13,9 +13,9 @@ variable "rg_location" {
   description = "Location of the Resource Group"
 }
 
-variable "veeam_sa_name" {
+variable "storage_account_name" {
   type        = string
-  description = "Name of the Veeam Storage Account"
+  description = "Name of the Storage Account"
 }
 
 variable "account_kind" {

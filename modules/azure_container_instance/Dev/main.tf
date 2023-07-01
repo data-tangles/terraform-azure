@@ -1,18 +1,3 @@
-terraform {
-  required_version = ">= 1.0"
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "3.63.0"
-    }
-  }
-  backend "azurerm" {}
-}
-
-provider "azurerm" {
-  features {}
-}
-
 data "terraform_remote_state" "networking" {
   backend = "azurerm"
   config = {
@@ -33,24 +18,25 @@ data "terraform_remote_state" "acr" {
   }
 }
 
-locals {
-  common_tags = {
-    environment = var.tag_environment
-    createdby   = "Terraform"
-    createdon   = formatdate("DD-MM-YYYY hh:mm ZZZ", timestamp())
-  }
-}
-
 resource "azurerm_resource_group" "aci_rg" {
   name     = var.rg_name
   location = var.rg_location
   tags     = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = [tags.createdon]
+  }
 }
 
 resource "azurerm_user_assigned_identity" "aci_mi" {
   name                = "${var.aci_name}-mi"
   location            = azurerm_resource_group.aci_rg.location
   resource_group_name = azurerm_resource_group.aci_rg.name
+  tags                = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = [tags.createdon]
+  }
 }
 
 resource "azurerm_role_assignment" "aci_rbac" {
@@ -68,6 +54,11 @@ resource "azurerm_container_group" "aci" {
   subnet_ids          = [data.terraform_remote_state.networking.outputs.aci_snet_id]
   os_type             = "Linux"
   depends_on          = [azurerm_role_assignment.aci_rbac]
+  tags                = merge(local.common_tags)
+
+  lifecycle {
+    ignore_changes = [tags.createdon]
+  }
 
   image_registry_credential {
     user_assigned_identity_id = azurerm_user_assigned_identity.aci_mi.id

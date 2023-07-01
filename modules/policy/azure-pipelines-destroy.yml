@@ -31,7 +31,7 @@ stages:
           inputs:
             backendType: 'azurerm'
             command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/policy/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/modules/policy/'
             backendServiceArm: '$(backendServiceArm)'
             backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
             backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
@@ -43,7 +43,7 @@ stages:
           displayName: 'Policy Terraform Plan Destroy'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/policy/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/modules/policy/'
             commandOptions: '-destroy -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
@@ -52,7 +52,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/policy/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/modules/policy/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -89,13 +89,13 @@ stages:
                 displayName: 'Extract Plan Artifact'
                 inputs:
                   archiveFilePatterns: '$(Pipeline.Workspace)/policy-plan-destroy/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/policy/'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/modules/policy/'
                   cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/policy/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/modules/policy/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false

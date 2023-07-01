@@ -6,13 +6,13 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 3.62.1 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 3.63.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.62.1 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.63.0 |
 | <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
 ## Modules
@@ -23,10 +23,10 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_linux_virtual_machine.linux_vm](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/linux_virtual_machine) | resource |
-| [azurerm_network_interface.vm_nic](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/network_interface) | resource |
-| [azurerm_resource_group.linux_vm_rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/resources/resource_group) | resource |
-| [azurerm_key_vault_secret.vmpassword](https://registry.terraform.io/providers/hashicorp/azurerm/3.62.1/docs/data-sources/key_vault_secret) | data source |
+| [azurerm_linux_virtual_machine.linux_vm](https://registry.terraform.io/providers/hashicorp/azurerm/3.63.0/docs/resources/linux_virtual_machine) | resource |
+| [azurerm_network_interface.vm_nic](https://registry.terraform.io/providers/hashicorp/azurerm/3.63.0/docs/resources/network_interface) | resource |
+| [azurerm_resource_group.linux_vm_rg](https://registry.terraform.io/providers/hashicorp/azurerm/3.63.0/docs/resources/resource_group) | resource |
+| [azurerm_key_vault_secret.vmpassword](https://registry.terraform.io/providers/hashicorp/azurerm/3.63.0/docs/data-sources/key_vault_secret) | data source |
 | [terraform_remote_state.networking](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 
 ## Inputs

@@ -5,7 +5,7 @@ resource "azurerm_network_security_group" "vm_snet_nsg" {
   tags                = merge(local.common_tags)
 
   lifecycle {
-    ignore_changes = ["tags.createdon"]
+    ignore_changes = [tags.createdon]
   }
 }
 
@@ -22,7 +22,7 @@ resource "azurerm_network_security_group" "aci_snet_nsg" {
   tags                = merge(local.common_tags)
 
   lifecycle {
-    ignore_changes = ["tags.createdon"]
+    ignore_changes = [tags.createdon]
   }
 }
 
@@ -39,7 +39,7 @@ resource "azurerm_network_security_group" "avd_snet_nsg" {
   tags                = merge(local.common_tags)
 
   lifecycle {
-    ignore_changes = ["tags.createdon"]
+    ignore_changes = [tags.createdon]
   }
 }
 

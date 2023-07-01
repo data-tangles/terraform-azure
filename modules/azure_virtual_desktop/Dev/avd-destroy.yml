@@ -1,0 +1,113 @@
+variables:
+- group: terraform-azure
+
+resources:
+  repositories:
+    - repository: 'TerraformVars'
+      type: github
+      endpoint: qman-being
+      name: qman-being/terraform-vars
+
+parameters:
+  - name: terraformVersion
+    type: string
+    default: 'latest'
+
+trigger:
+- none
+
+stages:
+
+- stage: 'DevEnvironmentAVDDestroy'
+  dependsOn: []
+  displayName: Dev Environment AVD Destroy
+
+  jobs:
+    - job: 'TerraformInitPlan_AVDDestroy'
+      displayName: 'Initialize and Plan Terraform for Dev Environment AVD Destroy'
+      pool: 'Azure Pipelines'
+      
+      steps:
+        - checkout: self
+        - checkout: TerraformVars
+
+        - task: TerraformInstaller@0
+          displayName: 'Terraform Install'
+          inputs:
+            terraformVersion: ${{ parameters.terraformVersion }}
+            
+        - task: TerraformCLI@0
+          displayName: 'Dev AVD Terraform Init'
+          inputs:
+            command: 'init'
+            backendType: 'azurerm'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/Dev/'
+            backendServiceArm: '$(backendServiceArm)'
+            backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
+            backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
+            backendAzureRmContainerName: 'dev-tfstate'
+            backendAzureRmKey: 'dev.avd.terraform.tfstate'
+            allowTelemetryCollection: false
+
+        - task: TerraformCLI@0
+          displayName: 'Dev AVD Terraform Plan Destroy'
+          inputs:
+            command: 'plan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/Dev/'
+            commandOptions: '-destroy -var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/azure_virtual_desktop/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            environmentServiceName: '$(backendServiceArm)'
+            allowTelemetryCollection: false
+
+        - task: ArchiveFiles@2
+          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+          displayName: 'Create Plan Artifact'
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/Dev/'
+            includeRootFolder: false
+            archiveType: 'tar'
+            tarCompression: 'gz'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
+            replaceExistingArchive: true
+
+        - task: PublishPipelineArtifact@1
+          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+          displayName: 'Publish Plan Artifact'
+          inputs:
+            targetPath: '$(Build.ArtifactStagingDirectory)'
+            artifactName: 'dev-avd-plan-destroy'
+            
+- stage: 'DevEnvironmentAVDApplyDestroy'
+  dependsOn: 'DevEnvironmentAVDDestroy'
+  displayName: Dev Environment AVD Apply Destroy
+  
+  jobs:          
+    - deployment: 'TerraformApply_AVDDestroy'
+      displayName: 'Apply Terraform for Dev Environment AVD Destroy'
+      pool: 'Azure Pipelines'
+      environment: Dev
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+              - checkout: TerraformVars
+
+              - task: TerraformInstaller@0
+                displayName: 'Terraform Install'
+                inputs:
+                  terraformVersion: ${{ parameters.terraformVersion }}
+
+              - task: ExtractFiles@1
+                displayName: 'Extract Plan Artifact'
+                inputs:
+                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-avd-plan-destroy/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/Dev/'
+                  cleanDestinationFolder: true
+
+              - task: TerraformCLI@0
+                inputs:
+                  command: 'apply'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/Dev/'
+                  commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
+                  environmentServiceName: '$(backendServiceArm)'
+                  allowTelemetryCollection: false

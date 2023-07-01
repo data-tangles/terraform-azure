@@ -1,21 +1,3 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "3.63.0"
-    }
-  }
-  backend "azurerm" {}
-}
-
-provider "azurerm" {
-  features {}
-}
-
-terraform {
-  required_version = ">= 1.0"
-}
-
 data "azurerm_subscription" "current" {}
 
 resource "azurerm_subscription_policy_assignment" "deny_vm_pip" {
