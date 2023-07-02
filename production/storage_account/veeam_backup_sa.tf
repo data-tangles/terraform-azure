@@ -4,7 +4,7 @@ resource "azurerm_resource_group" "rg" {
   tags     = merge(local.common_tags)
 
   lifecycle {
-    ignore_changes = [tags.createdon]
+    ignore_changes = [tags["createdon"]]
   }
 }
 
@@ -27,7 +27,7 @@ resource "azurerm_storage_account" "veeam_backup" {
   tags                     = merge(local.common_tags)
 
   lifecycle {
-    ignore_changes = [tags.createdon]
+    ignore_changes = [tags["createdon"]]
   }
 }
 
