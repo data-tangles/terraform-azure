@@ -3,6 +3,11 @@ variable "tag_environment" {
   description = "Tag Value for Environment"
 }
 
+variable "tag_purpose" {
+  type        = string
+  description = "Tag Value for Purpose"
+}
+
 variable "rg_name" {
   type        = string
   description = "Name of the Resource Group"
