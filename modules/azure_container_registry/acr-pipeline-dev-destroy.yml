@@ -18,15 +18,14 @@ trigger:
 
 stages:
 
-- stage: 'DevEnvironmentStorage'
+- stage: 'DevEnvironmentACR'
   dependsOn: []
-  displayName: Dev Environment Storage
+  displayName: Dev Environment ACR
 
-  jobs:
-    - job: 'TerraformInitPlan_Storage'
-      displayName: 'Initialize and Plan Terraform for Dev Environment Storage'
+  jobs:          
+    - job: 'TerraformInitPlan_ACR'
+      displayName: 'Initialize and Plan Terraform Destroy for Dev Environment ACR'
       pool: 'Azure Pipelines'
-      
       steps:
         - checkout: self
         - checkout: TerraformVars
@@ -35,26 +34,26 @@ stages:
           displayName: 'Terraform Install'
           inputs:
             terraformVersion: ${{ parameters.terraformVersion }}
-        
+
         - task: TerraformCLI@0
-          displayName: 'Dev Storage Terraform Init'
+          displayName: 'Dev ACR Terraform Init'
           inputs:
             backendType: 'azurerm'
             command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/storage_account/Dev/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_registry/'
             backendServiceArm: '$(backendServiceArm)'
             backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
             backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
             backendAzureRmContainerName: 'dev-tfstate'
-            backendAzureRmKey: 'dev.storage.terraform.tfstate'
+            backendAzureRmKey: 'dev.acr.terraform.tfstate'
             allowTelemetryCollection: false
 
         - task: TerraformCLI@0
-          displayName: 'Dev Storage Terraform Plan'
+          displayName: 'Dev ACR Terraform Plan Destroy'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/storage_account/Dev/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/storage/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_registry/'
+            commandOptions: '-destroy -var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/azure_container_registry/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
@@ -62,32 +61,32 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/storage_account/Dev/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_registry/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
             archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
             replaceExistingArchive: true
-      
+            
         - task: PublishPipelineArtifact@1
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Publish Plan Artifact'
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'dev-storage-plan'
-
-- stage: 'DevEnvironmentStorageApply'
-  dependsOn: 'DevEnvironmentStorage'
-  displayName: Dev Environment Storage Apply
+            artifactName: 'dev-acr-plan-destroy'
+            
+- stage: 'DevEnvironmentACRApply'
+  dependsOn: 'DevEnvironmentACR'
+  displayName: Dev Environment ACR Apply Destroy
   
   jobs:          
-    - deployment: 'TerraformApply_Storage'
-      displayName: 'Apply Terraform for Dev Environment Storage'
+    - deployment: 'TerraformApply_ACR'
+      displayName: 'Apply Terraform Destroy for Dev Environment ACR'
       pool: 'Azure Pipelines'
       environment: Dev
       strategy:
         runOnce:
-          deploy:
+          deploy:     
             steps:
               - checkout: self
               - checkout: TerraformVars
@@ -100,15 +99,14 @@ stages:
               - task: ExtractFiles@1
                 displayName: 'Extract Plan Artifact'
                 inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-storage-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/storage_account/Dev/'
+                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-acr-plan-destroy/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_registry/'
                   cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/storage_account/Dev/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_registry/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false
-      

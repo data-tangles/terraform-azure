@@ -1,0 +1,113 @@
+variables:
+  - group: terraform-azure
+
+resources:
+  repositories:
+    - repository: 'TerraformVars'
+      type: github
+      endpoint: qman-being
+      name: qman-being/terraform-vars
+
+parameters:
+  - name: terraformVersion
+    type: string
+    default: 'latest'
+
+trigger:
+- none
+
+stages:
+
+- stage: 'DevEnvironmentNetworking'
+  dependsOn: []
+  displayName: Dev Environment Networking
+
+  jobs:
+    - job: 'TerraformInitPlan_Networking'
+      displayName: 'Initialize and Plan Terraform for Dev Environment Networking'
+      pool: 'Azure Pipelines'
+      
+      steps:
+        - checkout: self
+        - checkout: TerraformVars
+
+        - task: TerraformInstaller@0
+          displayName: 'Terraform Install'
+          inputs:
+            terraformVersion: ${{ parameters.terraformVersion }}
+            
+        - task: TerraformCLI@0
+          displayName: 'Dev Networking Terraform Init'
+          inputs:
+            command: 'init'
+            backendType: 'azurerm'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+            backendServiceArm: '$(backendServiceArm)'
+            backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
+            backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
+            backendAzureRmContainerName: 'dev-tfstate'
+            backendAzureRmKey: 'dev.networking.terraform.tfstate'
+            allowTelemetryCollection: false
+
+        - task: TerraformCLI@0
+          displayName: 'Dev Networking Terraform Plan'
+          inputs:
+            command: 'plan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            environmentServiceName: '$(backendServiceArm)'
+            allowTelemetryCollection: false
+
+        - task: ArchiveFiles@2
+          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+          displayName: 'Create Plan Artifact'
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+            includeRootFolder: false
+            archiveType: 'tar'
+            tarCompression: 'gz'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
+            replaceExistingArchive: true
+
+        - task: PublishPipelineArtifact@1
+          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+          displayName: 'Publish Plan Artifact'
+          inputs:
+            targetPath: '$(Build.ArtifactStagingDirectory)'
+            artifactName: 'dev-networking-plan'
+            
+- stage: 'DevEnvironmentNetworkingApply'
+  dependsOn: 'DevEnvironmentNetworking'
+  displayName: Dev Environment Networking Apply
+  
+  jobs:          
+    - deployment: 'TerraformApply_Networking'
+      displayName: 'Apply Terraform for Dev Environment Networking'
+      pool: 'Azure Pipelines'
+      environment: Dev
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+              - checkout: TerraformVars
+
+              - task: TerraformInstaller@0
+                displayName: 'Terraform Install'
+                inputs:
+                  terraformVersion: ${{ parameters.terraformVersion }}
+
+              - task: ExtractFiles@1
+                displayName: 'Extract Plan Artifact'
+                inputs:
+                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-networking-plan/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+                  cleanDestinationFolder: true
+
+              - task: TerraformCLI@0
+                inputs:
+                  command: 'apply'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+                  commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
+                  environmentServiceName: '$(backendServiceArm)'
+                  allowTelemetryCollection: false

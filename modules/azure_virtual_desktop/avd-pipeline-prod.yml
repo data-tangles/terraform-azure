@@ -1,5 +1,5 @@
 variables:
-  - group: terraform-azure
+- group: terraform-azure
 
 resources:
   repositories:
@@ -18,13 +18,13 @@ trigger:
 
 stages:
 
-- stage: 'DevEnvironmentNetworking'
+- stage: 'ProdEnvironmentAVD'
   dependsOn: []
-  displayName: Dev Environment Networking
+  displayName: Prod Environment AVD
 
   jobs:
-    - job: 'TerraformInitPlan_Networking'
-      displayName: 'Initialize and Plan Terraform for Dev Environment Networking'
+    - job: 'TerraformInitPlan_AVD'
+      displayName: 'Initialize and Plan Terraform for Prod Environment AVD'
       pool: 'Azure Pipelines'
       
       steps:
@@ -37,24 +37,24 @@ stages:
             terraformVersion: ${{ parameters.terraformVersion }}
             
         - task: TerraformCLI@0
-          displayName: 'Dev Networking Terraform Init'
+          displayName: 'Prod Networking Terraform Init'
           inputs:
             command: 'init'
             backendType: 'azurerm'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/Dev/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/'
             backendServiceArm: '$(backendServiceArm)'
             backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
             backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
-            backendAzureRmContainerName: 'dev-tfstate'
-            backendAzureRmKey: 'dev.networking.terraform.tfstate'
+            backendAzureRmContainerName: 'prod-tfstate'
+            backendAzureRmKey: 'prod.avd.terraform.tfstate'
             allowTelemetryCollection: false
 
         - task: TerraformCLI@0
-          displayName: 'Dev Networking Terraform Plan'
+          displayName: 'Prod AVD Terraform Plan'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/Dev/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/azure_virtual_desktop/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
@@ -62,7 +62,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/Dev/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -74,17 +74,17 @@ stages:
           displayName: 'Publish Plan Artifact'
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'dev-networking-plan'
+            artifactName: 'prod-avd-plan'
             
-- stage: 'DevEnvironmentNetworkingApply'
-  dependsOn: 'DevEnvironmentNetworking'
-  displayName: Dev Environment Networking Apply
+- stage: 'ProdEnvironmentAVDApply'
+  dependsOn: 'ProdEnvironmentAVD'
+  displayName: Prod Environment AVD Apply
   
   jobs:          
-    - deployment: 'TerraformApply_Networking'
-      displayName: 'Apply Terraform for Dev Environment Networking'
+    - deployment: 'TerraformApply_AVD'
+      displayName: 'Apply Terraform for Prod Environment AVD'
       pool: 'Azure Pipelines'
-      environment: Dev
+      environment: Prod
       strategy:
         runOnce:
           deploy:
@@ -100,14 +100,14 @@ stages:
               - task: ExtractFiles@1
                 displayName: 'Extract Plan Artifact'
                 inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-networking-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/Dev/'
+                  archiveFilePatterns: '$(Pipeline.Workspace)/prod-avd-plan/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/'
                   cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/Dev/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false

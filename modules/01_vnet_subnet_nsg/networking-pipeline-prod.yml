@@ -1,5 +1,5 @@
 variables:
-- group: terraform-azure
+  - group: terraform-azure
 
 resources:
   repositories:
@@ -18,13 +18,13 @@ trigger:
 
 stages:
 
-- stage: 'DevEnvironmentStorageDestroy'
+- stage: 'ProdEnvironmentNetworking'
   dependsOn: []
-  displayName: Dev Environment Storage Destroy
+  displayName: Prod Environment Networking
 
   jobs:
-    - job: 'TerraformInitPlan_Storage'
-      displayName: 'Initialize and Plan Terraform for Dev Environment Storage Destroy'
+    - job: 'TerraformInitPlan_Networking'
+      displayName: 'Initialize and Plan Terraform for Prod Environment Networking'
       pool: 'Azure Pipelines'
       
       steps:
@@ -35,26 +35,26 @@ stages:
           displayName: 'Terraform Install'
           inputs:
             terraformVersion: ${{ parameters.terraformVersion }}
-        
+            
         - task: TerraformCLI@0
-          displayName: 'Dev Storage Terraform Init'
+          displayName: 'Prod Networking Terraform Init'
           inputs:
-            backendType: 'azurerm'
             command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/modules/storage_account/Dev/'
+            backendType: 'azurerm'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
             backendServiceArm: '$(backendServiceArm)'
             backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
             backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
-            backendAzureRmContainerName: 'dev-tfstate'
-            backendAzureRmKey: 'dev.storage.terraform.tfstate'
+            backendAzureRmContainerName: 'prod-tfstate'
+            backendAzureRmKey: 'prod.networking.terraform.tfstate'
             allowTelemetryCollection: false
 
         - task: TerraformCLI@0
-          displayName: 'Dev Storage Terraform Plan Destroy'
+          displayName: 'Prod Networking Terraform Plan'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/modules/storage_account/Dev/'
-            commandOptions: '-destroy -var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/storage/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/vnet_subnet_nsg/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
@@ -62,29 +62,29 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/modules/storage_account/Dev/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
             archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
             replaceExistingArchive: true
-      
+
         - task: PublishPipelineArtifact@1
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Publish Plan Artifact'
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'dev-storage-plan-destroy'
-
-- stage: 'DevEnvironmentStorageApplyDestroy'
-  dependsOn: 'DevEnvironmentStorageDestroy'
-  displayName: Dev Environment Storage Apply Destroy
+            artifactName: 'prod-networking-plan'
+            
+- stage: 'ProdEnvironmentNetworkingApply'
+  dependsOn: 'ProdEnvironmentNetworking'
+  displayName: Prod Environment Networking Apply
   
   jobs:          
-    - deployment: 'TerraformApply_StorageDestroy'
-      displayName: 'Apply Terraform for Dev Environment Storage Destroy'
+    - deployment: 'TerraformApply_Networking'
+      displayName: 'Apply Terraform for Prod Environment Networking'
       pool: 'Azure Pipelines'
-      environment: Dev
+      environment: Prod
       strategy:
         runOnce:
           deploy:
@@ -100,15 +100,14 @@ stages:
               - task: ExtractFiles@1
                 displayName: 'Extract Plan Artifact'
                 inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-storage-plan-destroy/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/modules/storage_account/Dev/'
+                  archiveFilePatterns: '$(Pipeline.Workspace)/Prod-networking-plan/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
                   cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/modules/storage_account/Dev/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false
-      

@@ -1,5 +1,5 @@
 variables:
-- group: terraform-azure
+  - group: terraform-azure
 
 resources:
   repositories:
@@ -17,15 +17,16 @@ trigger:
 - none
 
 stages:
-
-- stage: 'DevEnvironmentVMSS'
+         
+- stage: 'DevEnvironmentKeyVault'
   dependsOn: []
-  displayName: Dev Environment VMSS
-
+  displayName: Dev Environment Key Vault
+  
   jobs:          
-    - job: 'TerraformInitPlan_VMSS'
-      displayName: 'Initialize and Plan Terraform Destroy for Dev Environment VMSS'
-      pool: 'Azure Pipelines'
+    - job: 'TerraformInitPlan_KeyVault'
+      displayName: 'Initialize and Plan Terraform for Dev Environment Key Vault'
+      pool: 'dev-ado-agents'
+      
       steps:
         - checkout: self
         - checkout: TerraformVars
@@ -36,24 +37,24 @@ stages:
             terraformVersion: ${{ parameters.terraformVersion }}
 
         - task: TerraformCLI@0
-          displayName: 'Dev VMSS Terraform Init'
+          displayName: 'Dev Key Vault Terraform Init'
           inputs:
-            backendType: 'azurerm'
             command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/ado_agent_vmss/Dev/'
+            backendType: 'azurerm'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/02_key_vault/'
             backendServiceArm: '$(backendServiceArm)'
             backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
             backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
             backendAzureRmContainerName: 'dev-tfstate'
-            backendAzureRmKey: 'dev.virtualmachines.terraform.tfstate'
+            backendAzureRmKey: 'dev.keyvault.terraform.tfstate'
             allowTelemetryCollection: false
 
         - task: TerraformCLI@0
-          displayName: 'Dev VMSS Terraform Plan Destroy'
+          displayName: 'Dev Key Vault Terraform Plan'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/ado_agent_vmss/Dev/'
-            commandOptions: '-destroy -var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/ado_agent_vmss/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/02_key_vault/'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/key_vault/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
@@ -61,7 +62,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/ado_agent_vmss/Dev/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/02_key_vault/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -73,20 +74,20 @@ stages:
           displayName: 'Publish Plan Artifact'
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'dev-vmss-plan-destroy'
+            artifactName: 'dev-keyvault-plan'
             
-- stage: 'DevEnvironmentVMSSApply'
-  dependsOn: 'DevEnvironmentVMSS'
-  displayName: Dev Environment VMSS Apply Destroy
+- stage: 'DevEnvironmentKeyVaultApply'
+  dependsOn: 'DevEnvironmentKeyVault'
+  displayName: Dev Environment Key Vault Apply
   
   jobs:          
-    - deployment: 'TerraformApply_VMSS'
-      displayName: 'Apply Terraform Destroy for Dev Environment VMSS'
-      pool: 'Azure Pipelines'
+    - deployment: 'TerraformApply_KeyVault'
+      displayName: 'Apply Terraform for Dev Environment Key Vault'
+      pool: 'dev-ado-agents'
       environment: Dev
       strategy:
         runOnce:
-          deploy:     
+          deploy:
             steps:
               - checkout: self
               - checkout: TerraformVars
@@ -99,14 +100,15 @@ stages:
               - task: ExtractFiles@1
                 displayName: 'Extract Plan Artifact'
                 inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-vmss-plan-destroy/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/ado_agent_vmss/Dev/'
+                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-keyvault-plan/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/02_key_vault/'
                   cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/ado_agent_vmss/Dev/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/02_key_vault/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false
+      

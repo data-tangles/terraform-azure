@@ -1,0 +1,114 @@
+variables:
+  - group: terraform-azure
+
+resources:
+  repositories:
+    - repository: 'TerraformVars'
+      type: github
+      endpoint: qman-being
+      name: qman-being/terraform-vars
+
+parameters:
+  - name: terraformVersion
+    type: string
+    default: 'latest'
+
+trigger:
+- none
+
+stages:
+         
+- stage: 'ProdEnvironmentKeyVault'
+  dependsOn: []
+  displayName: Prod Environment Key Vault
+  
+  jobs:          
+    - job: 'TerraformInitPlan_KeyVault'
+      displayName: 'Initialize and Plan Terraform for Prod Environment Key Vault'
+      pool: 'prod-ado-agents'
+      
+      steps:
+        - checkout: self
+        - checkout: TerraformVars
+
+        - task: TerraformInstaller@0
+          displayName: 'Terraform Install'
+          inputs:
+            terraformVersion: ${{ parameters.terraformVersion }}
+
+        - task: TerraformCLI@0
+          displayName: 'Prod Key Vault Terraform Init'
+          inputs:
+            command: 'init'
+            backendType: 'azurerm'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/02_key_vault/'
+            backendServiceArm: '$(backendServiceArm)'
+            backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
+            backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
+            backendAzureRmContainerName: 'prod-tfstate'
+            backendAzureRmKey: 'prod.keyvault.terraform.tfstate'
+            allowTelemetryCollection: false
+
+        - task: TerraformCLI@0
+          displayName: 'Prod Key Vault Terraform Plan'
+          inputs:
+            command: 'plan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/02_key_vault/'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/key_vault/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            environmentServiceName: '$(backendServiceArm)'
+            allowTelemetryCollection: false
+
+        - task: ArchiveFiles@2
+          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+          displayName: 'Create Plan Artifact'
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/02_key_vault/'
+            includeRootFolder: false
+            archiveType: 'tar'
+            tarCompression: 'gz'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
+            replaceExistingArchive: true
+            
+        - task: PublishPipelineArtifact@1
+          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+          displayName: 'Publish Plan Artifact'
+          inputs:
+            targetPath: '$(Build.ArtifactStagingDirectory)'
+            artifactName: 'prod-keyvault-plan'
+            
+- stage: 'ProdEnvironmentKeyVaultApply'
+  dependsOn: 'ProdEnvironmentKeyVault'
+  displayName: Prod Environment Key Vault Apply
+  
+  jobs:          
+    - deployment: 'TerraformApply_KeyVault'
+      displayName: 'Apply Terraform for Prod Environment Key Vault'
+      pool: 'prod-ado-agents'
+      environment: Prod
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+              - checkout: TerraformVars
+
+              - task: TerraformInstaller@0
+                displayName: 'Terraform Install'
+                inputs:
+                  terraformVersion: ${{ parameters.terraformVersion }}
+
+              - task: ExtractFiles@1
+                displayName: 'Extract Plan Artifact'
+                inputs:
+                  archiveFilePatterns: '$(Pipeline.Workspace)/prod-keyvault-plan/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/02_key_vault/'
+                  cleanDestinationFolder: true
+
+              - task: TerraformCLI@0
+                inputs:
+                  command: 'apply'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/02_key_vault/'
+                  commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
+                  environmentServiceName: '$(backendServiceArm)'
+                  allowTelemetryCollection: false
+      

@@ -18,14 +18,15 @@ trigger:
 
 stages:
 
-- stage: 'DevEnvironmentVMSS'
+- stage: 'DevEnvironmentWindowsVM'
   dependsOn: []
-  displayName: Dev Environment VMSS
+  displayName: Dev Environment Windows VM
 
-  jobs:          
-    - job: 'TerraformInitPlan_VMSS'
-      displayName: 'Initialize and Plan Terraform for Dev Environment VMSS'
+  jobs:
+    - job: 'TerraformInitPlan_WindowsVM'
+      displayName: 'Initialize and Plan Terraform for Dev Environment Windows VM'
       pool: 'Azure Pipelines'
+      
       steps:
         - checkout: self
         - checkout: TerraformVars
@@ -36,11 +37,11 @@ stages:
             terraformVersion: ${{ parameters.terraformVersion }}
 
         - task: TerraformCLI@0
-          displayName: 'Dev VMSS Terraform Init'
+          displayName: 'Dev Windows VM Terraform Init'
           inputs:
             backendType: 'azurerm'
             command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/ado_agent_vmss/Dev/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/virtual_machine/windows/'
             backendServiceArm: '$(backendServiceArm)'
             backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
             backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
@@ -49,11 +50,11 @@ stages:
             allowTelemetryCollection: false
 
         - task: TerraformCLI@0
-          displayName: 'Dev VMSS Terraform Plan'
+          displayName: 'Dev Windows VM Terraform Plan'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/ado_agent_vmss/Dev/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/ado_agent_vmss/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/virtual_machine/windows/'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/virtual_machine/windows/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
@@ -61,7 +62,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/ado_agent_vmss/Dev/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/modules/virtual_machine/windows/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -73,20 +74,20 @@ stages:
           displayName: 'Publish Plan Artifact'
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'dev-vmss-plan'
-            
-- stage: 'DevEnvironmentVMSSApply'
-  dependsOn: 'DevEnvironmentVMSS'
-  displayName: Dev Environment VMSS Apply
+            artifactName: 'dev-windowsvm-plan'
+
+- stage: 'DevEnvironmentWindowsVMApply'
+  dependsOn: 'DevEnvironmentWindowsVM'
+  displayName: Dev Environment Windows VM Apply
   
   jobs:          
-    - deployment: 'TerraformApply_VMSS'
-      displayName: 'Apply Terraform for Dev Environment VMSS'
+    - deployment: 'TerraformApply_WindowsVM'
+      displayName: 'Apply Terraform for Dev Environment Windows VM'
       pool: 'Azure Pipelines'
       environment: Dev
       strategy:
         runOnce:
-          deploy:     
+          deploy:
             steps:
               - checkout: self
               - checkout: TerraformVars
@@ -99,14 +100,14 @@ stages:
               - task: ExtractFiles@1
                 displayName: 'Extract Plan Artifact'
                 inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-vmss-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/ado_agent_vmss/Dev/'
+                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-windowsvm-plan/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/modules/virtual_machine/windows/'
                   cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/ado_agent_vmss/Dev/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/modules/virtual_machine/windows/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false

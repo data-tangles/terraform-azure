@@ -1,0 +1,112 @@
+variables:
+- group: terraform-azure
+
+resources:
+  repositories:
+    - repository: 'TerraformVars'
+      type: github
+      endpoint: qman-being
+      name: qman-being/terraform-vars
+
+parameters:
+  - name: terraformVersion
+    type: string
+    default: 'latest'
+
+trigger:
+- none
+
+stages:
+
+- stage: 'DevEnvironmentLinuxVM'
+  dependsOn: []
+  displayName: Dev Environment Linux VM
+
+  jobs:          
+    - job: 'TerraformInitPlan_LinuxVM'
+      displayName: 'Initialize and Plan Terraform for Dev Environment Linux VM'
+      pool: 'Azure Pipelines'
+      steps:
+        - checkout: self
+        - checkout: TerraformVars
+
+        - task: TerraformInstaller@0
+          displayName: 'Terraform Install'
+          inputs:
+            terraformVersion: ${{ parameters.terraformVersion }}
+
+        - task: TerraformCLI@0
+          displayName: 'Dev Linux VM Terraform Init'
+          inputs:
+            backendType: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/virtual_machine/linux/'
+            backendServiceArm: '$(backendServiceArm)'
+            backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
+            backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
+            backendAzureRmContainerName: 'dev-tfstate'
+            backendAzureRmKey: 'dev.virtualmachines.terraform.tfstate'
+            allowTelemetryCollection: false
+
+        - task: TerraformCLI@0
+          displayName: 'Dev Linux VM Terraform Plan'
+          inputs:
+            command: 'plan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/virtual_machine/linux/'
+            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/virtual_machine/linux/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            environmentServiceName: '$(backendServiceArm)'
+            allowTelemetryCollection: false
+
+        - task: ArchiveFiles@2
+          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+          displayName: 'Create Plan Artifact'
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/modules/virtual_machine/linux/'
+            includeRootFolder: false
+            archiveType: 'tar'
+            tarCompression: 'gz'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
+            replaceExistingArchive: true
+            
+        - task: PublishPipelineArtifact@1
+          condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+          displayName: 'Publish Plan Artifact'
+          inputs:
+            targetPath: '$(Build.ArtifactStagingDirectory)'
+            artifactName: 'dev-linuxvm-plan'
+            
+- stage: 'DevEnvironmentLinuxVMApply'
+  dependsOn: 'DevEnvironmentLinuxVM'
+  displayName: Dev Environment Linux VM Apply
+  
+  jobs:          
+    - deployment: 'TerraformApply_LinuxVM'
+      displayName: 'Apply Terraform for Dev Environment Linux VM'
+      pool: 'Azure Pipelines'
+      environment: Dev
+      strategy:
+        runOnce:
+          deploy:     
+            steps:
+              - checkout: self
+              - checkout: TerraformVars
+
+              - task: TerraformInstaller@0
+                displayName: 'Terraform Install'
+                inputs:
+                  terraformVersion: ${{ parameters.terraformVersion }}
+
+              - task: ExtractFiles@1
+                displayName: 'Extract Plan Artifact'
+                inputs:
+                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-linuxvm-plan/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/modules/virtual_machine/linux/'
+                  cleanDestinationFolder: true
+
+              - task: TerraformCLI@0
+                inputs:
+                  command: 'apply'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/terraform-azure/modules/virtual_machine/linux/'
+                  commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
+                  environmentServiceName: '$(backendServiceArm)'
+                  allowTelemetryCollection: false

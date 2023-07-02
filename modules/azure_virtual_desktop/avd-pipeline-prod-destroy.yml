@@ -18,14 +18,15 @@ trigger:
 
 stages:
 
-- stage: 'DevEnvironmentACR'
+- stage: 'ProdEnvironmentAVDDestroy'
   dependsOn: []
-  displayName: Dev Environment ACR
+  displayName: Prod Environment AVD Destroy
 
-  jobs:          
-    - job: 'TerraformInitPlan_ACR'
-      displayName: 'Initialize and Plan Terraform for Dev Environment ACR'
+  jobs:
+    - job: 'TerraformInitPlan_AVDDestroy'
+      displayName: 'Initialize and Plan Terraform for Prod Environment AVD Destroy'
       pool: 'Azure Pipelines'
+      
       steps:
         - checkout: self
         - checkout: TerraformVars
@@ -34,26 +35,26 @@ stages:
           displayName: 'Terraform Install'
           inputs:
             terraformVersion: ${{ parameters.terraformVersion }}
-
+            
         - task: TerraformCLI@0
-          displayName: 'Dev ACR Terraform Init'
+          displayName: 'Prod AVD Terraform Init'
           inputs:
-            backendType: 'azurerm'
             command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_registry/Dev/'
+            backendType: 'azurerm'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/'
             backendServiceArm: '$(backendServiceArm)'
             backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
             backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
-            backendAzureRmContainerName: 'dev-tfstate'
-            backendAzureRmKey: 'dev.acr.terraform.tfstate'
+            backendAzureRmContainerName: 'prod-tfstate'
+            backendAzureRmKey: 'prod.avd.terraform.tfstate'
             allowTelemetryCollection: false
 
         - task: TerraformCLI@0
-          displayName: 'Dev ACR Terraform Plan'
+          displayName: 'Prod AVD Terraform Plan Destroy'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_registry/Dev/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/azure_container_registry/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/'
+            commandOptions: '-destroy -var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/azure_virtual_desktop/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
@@ -61,32 +62,32 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_registry/Dev/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
             archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
             replaceExistingArchive: true
-            
+
         - task: PublishPipelineArtifact@1
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Publish Plan Artifact'
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'dev-acr-plan'
+            artifactName: 'prod-avd-plan-destroy'
             
-- stage: 'DevEnvironmentACRApply'
-  dependsOn: 'DevEnvironmentACR'
-  displayName: Dev Environment ACR Apply
+- stage: 'ProdEnvironmentAVDApplyDestroy'
+  dependsOn: 'ProdEnvironmentAVDDestroy'
+  displayName: Prod Environment AVD Apply Destroy
   
   jobs:          
-    - deployment: 'TerraformApply_ACR'
-      displayName: 'Apply Terraform for Dev Environment ACR'
+    - deployment: 'TerraformApply_AVDDestroy'
+      displayName: 'Apply Terraform for Prod Environment AVD Destroy'
       pool: 'Azure Pipelines'
-      environment: Dev
+      environment: Prod
       strategy:
         runOnce:
-          deploy:     
+          deploy:
             steps:
               - checkout: self
               - checkout: TerraformVars
@@ -99,14 +100,14 @@ stages:
               - task: ExtractFiles@1
                 displayName: 'Extract Plan Artifact'
                 inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-acr-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_registry/Dev/'
+                  archiveFilePatterns: '$(Pipeline.Workspace)/prod-avd-plan-destroy/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/'
                   cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_registry/Dev/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_virtual_desktop/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false

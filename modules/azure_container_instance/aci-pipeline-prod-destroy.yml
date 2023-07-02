@@ -18,13 +18,13 @@ trigger:
 
 stages:
 
-- stage: 'DevEnvironmentACI'
+- stage: 'ProdEnvironmentACI'
   dependsOn: []
-  displayName: Dev Environment ACI
+  displayName: Prod Environment ACI
 
   jobs:          
     - job: 'TerraformInitPlan_ACI'
-      displayName: 'Initialize and Plan Terraform for Dev Environment ACI'
+      displayName: 'Initialize and Plan Terraform Destroy for Prod Environment ACI'
       pool: 'Azure Pipelines'
       steps:
         - checkout: self
@@ -36,24 +36,24 @@ stages:
             terraformVersion: ${{ parameters.terraformVersion }}
 
         - task: TerraformCLI@0
-          displayName: 'Dev ACI Terraform Init'
+          displayName: 'Prod ACI Terraform Init'
           inputs:
             backendType: 'azurerm'
             command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_instance/Dev/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_instance/'
             backendServiceArm: '$(backendServiceArm)'
             backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
             backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
-            backendAzureRmContainerName: 'dev-tfstate'
-            backendAzureRmKey: 'dev.aci.terraform.tfstate'
+            backendAzureRmContainerName: 'prod-tfstate'
+            backendAzureRmKey: 'prod.aci.terraform.tfstate'
             allowTelemetryCollection: false
 
         - task: TerraformCLI@0
-          displayName: 'Dev ACI Terraform Plan'
+          displayName: 'Prod ACI Terraform Plan Destroy'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_instance/Dev/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/azure_container_instance/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_instance/'
+            commandOptions: '-destroy -var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/azure_container_instance/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
@@ -61,7 +61,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_instance/Dev/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_instance/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -73,17 +73,17 @@ stages:
           displayName: 'Publish Plan Artifact'
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'dev-aci-plan'
+            artifactName: 'prod-aci-plan-destroy'
             
-- stage: 'DevEnvironmentACIApply'
-  dependsOn: 'DevEnvironmentACI'
-  displayName: Dev Environment ACI Apply
+- stage: 'ProdEnvironmentACIApply'
+  dependsOn: 'ProdEnvironmentACI'
+  displayName: Prod Environment ACI Apply Destroy
   
   jobs:          
     - deployment: 'TerraformApply_ACI'
-      displayName: 'Apply Terraform for Dev Environment ACI'
+      displayName: 'Apply Terraform Destroy for Prod Environment ACI'
       pool: 'Azure Pipelines'
-      environment: Dev
+      environment: Prod
       strategy:
         runOnce:
           deploy:     
@@ -99,14 +99,14 @@ stages:
               - task: ExtractFiles@1
                 displayName: 'Extract Plan Artifact'
                 inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-aci-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_instance/Dev/'
+                  archiveFilePatterns: '$(Pipeline.Workspace)/prod-aci-plan-destroy/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_instance/'
                   cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_instance/Dev/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/azure_container_instance/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false
