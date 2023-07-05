@@ -36,6 +36,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_aci_name"></a> [aci\_name](#input\_aci\_name) | Name of the ACI | `string` | n/a | yes |
 | <a name="input_acr_server_url"></a> [acr\_server\_url](#input\_acr\_server\_url) | Server URL for the ACR | `string` | n/a | yes |
+| <a name="input_azp_pool"></a> [azp\_pool](#input\_azp\_pool) | Name of the Azure DevOps Agent Pool | `string` | n/a | yes |
 | <a name="input_azp_token"></a> [azp\_token](#input\_azp\_token) | Azure DevOps PAT | `string` | n/a | yes |
 | <a name="input_azp_url"></a> [azp\_url](#input\_azp\_url) | Azure DevOps URL | `string` | n/a | yes |
 | <a name="input_container_image"></a> [container\_image](#input\_container\_image) | Image of the Container | `string` | n/a | yes |

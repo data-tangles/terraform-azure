@@ -43,6 +43,7 @@ No modules.
 | <a name="input_rg_location"></a> [rg\_location](#input\_rg\_location) | Location of the Resource Group | `string` | n/a | yes |
 | <a name="input_rg_name"></a> [rg\_name](#input\_rg\_name) | Name of the Resource Group | `string` | n/a | yes |
 | <a name="input_tag_environment"></a> [tag\_environment](#input\_tag\_environment) | Tag Value for Environment | `string` | n/a | yes |
+| <a name="input_tag_purpose"></a> [tag\_purpose](#input\_tag\_purpose) | Tag Value for Purpose | `string` | n/a | yes |
 | <a name="input_veeam_sa_name"></a> [veeam\_sa\_name](#input\_veeam\_sa\_name) | Name of the Veeam Storage Account | `string` | n/a | yes |
 
 ## Outputs
