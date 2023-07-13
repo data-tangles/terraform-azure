@@ -16,6 +16,7 @@ This repo contains various Terraform modules for common services in Azure.
 The Git repository contains the following directories:
 
 ```sh
+📁 labs # these are lab environments composed of multiple modules
 📁 modules # these are common Azure Terraform Modules
 📁 production # these are modules specific to my own environment
 ```
