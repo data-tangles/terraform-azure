@@ -26,16 +26,16 @@ stages:
     - job: 'TerraformInitPlan_Storage'
       displayName: 'Initialize and Plan Terraform for Prod Environment Storage'
       pool: 'Azure Pipelines'
-      
+
       steps:
         - checkout: self
         - checkout: TerraformVars
 
-        - task: TerraformInstaller@0
+        - task: TerraformInstaller@1
           displayName: 'Terraform Install'
           inputs:
             terraformVersion: ${{ parameters.terraformVersion }}
-        
+
         - task: TerraformCLI@0
           displayName: 'Prod Storage Terraform Init'
           inputs:
@@ -68,7 +68,7 @@ stages:
             tarCompression: 'gz'
             archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).tgz'
             replaceExistingArchive: true
-      
+
         - task: PublishPipelineArtifact@1
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Publish Plan Artifact'
@@ -79,8 +79,8 @@ stages:
 - stage: 'ProdEnvironmentStorageApply'
   dependsOn: 'ProdEnvironmentStorage'
   displayName: Prod Environment Storage Apply
-  
-  jobs:          
+
+  jobs:
     - deployment: 'TerraformApply_Storage'
       displayName: 'Apply Terraform for Prod Environment Storage'
       pool: 'Azure Pipelines'
@@ -92,7 +92,7 @@ stages:
               - checkout: self
               - checkout: TerraformVars
 
-              - task: TerraformInstaller@0
+              - task: TerraformInstaller@1
                 displayName: 'Terraform Install'
                 inputs:
                   terraformVersion: ${{ parameters.terraformVersion }}
@@ -111,4 +111,3 @@ stages:
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false
-      
