@@ -1,13 +1,6 @@
 variables:
 - group: terraform-azure-prod
 
-resources:
-  repositories:
-    - repository: 'TerraformVars'
-      type: github
-      endpoint: qman-being
-      name: qman-being/terraform-vars
-
 parameters:
   - name: terraformVersion
     type: string
@@ -36,6 +29,16 @@ stages:
           inputs:
             terraformVersion: ${{ parameters.terraformVersion }}
 
+        - task: replacetokens@5
+          inputs:
+            rootDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/production/storage_account/'
+            targetFiles: '**/*.tfvars'
+            encoding: 'auto'
+            tokenPattern: 'default'
+            writeBOM: true
+            actionOnMissing: 'warn'
+            enableTelemetry: false
+
         - task: TerraformCLI@0
           displayName: 'Prod Storage Terraform Init'
           inputs:
@@ -54,7 +57,7 @@ stages:
           inputs:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/production/storage_account/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/storage/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            commandOptions: '-out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
