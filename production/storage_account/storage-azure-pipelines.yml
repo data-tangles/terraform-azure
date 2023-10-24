@@ -22,7 +22,6 @@ stages:
 
       steps:
         - checkout: self
-        - checkout: TerraformVars
 
         - task: TerraformInstaller@1
           displayName: 'Terraform Install'
