@@ -39,7 +39,7 @@ stages:
             actionOnMissing: 'warn'
             enableTelemetry: false
 
-        - task: TerraformCLI@0
+        - task: TerraformCLI@1
           displayName: 'Prod Storage Terraform Init'
           inputs:
             backendType: 'azurerm'
@@ -52,7 +52,7 @@ stages:
             backendAzureRmKey: 'prod.storage.terraform.tfstate'
             allowTelemetryCollection: false
 
-        - task: TerraformCLI@0
+        - task: TerraformCLI@1
           displayName: 'Prod Storage Terraform Plan'
           inputs:
             command: 'plan'
@@ -107,7 +107,7 @@ stages:
                   destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/production/storage_account/'
                   cleanDestinationFolder: true
 
-              - task: TerraformCLI@0
+              - task: TerraformCLI@1
                 inputs:
                   command: 'apply'
                   workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/production/storage_account/'
