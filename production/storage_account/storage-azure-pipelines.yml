@@ -1,13 +1,6 @@
 variables:
 - group: terraform-azure-prod
 
-resources:
-  repositories:
-    - repository: 'TerraformVars'
-      type: github
-      endpoint: qman-being
-      name: qman-being/terraform-vars
-
 parameters:
   - name: terraformVersion
     type: string
@@ -25,23 +18,32 @@ stages:
   jobs:
     - job: 'TerraformInitPlan_Storage'
       displayName: 'Initialize and Plan Terraform for Prod Environment Storage'
-      pool: 'Azure Pipelines'
+      pool: 'Self-Hosted'
 
       steps:
         - checkout: self
-        - checkout: TerraformVars
 
         - task: TerraformInstaller@1
           displayName: 'Terraform Install'
           inputs:
             terraformVersion: ${{ parameters.terraformVersion }}
 
-        - task: TerraformCLI@0
+        - task: replacetokens@5
+          inputs:
+            rootDirectory: '$(System.DefaultWorkingDirectory)/production/storage_account/'
+            targetFiles: '**/*.tfvars'
+            encoding: 'auto'
+            tokenPattern: 'default'
+            writeBOM: true
+            actionOnMissing: 'warn'
+            enableTelemetry: false
+
+        - task: TerraformCLI@1
           displayName: 'Prod Storage Terraform Init'
           inputs:
             backendType: 'azurerm'
             command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/production/storage_account/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/production/storage_account/'
             backendServiceArm: '$(backendServiceArm)'
             backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
             backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
@@ -49,12 +51,12 @@ stages:
             backendAzureRmKey: 'prod.storage.terraform.tfstate'
             allowTelemetryCollection: false
 
-        - task: TerraformCLI@0
+        - task: TerraformCLI@1
           displayName: 'Prod Storage Terraform Plan'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/production/storage_account/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/storage/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/production/storage_account/'
+            commandOptions: '-out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
@@ -62,7 +64,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/production/storage_account/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/production/storage_account/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -83,14 +85,13 @@ stages:
   jobs:
     - deployment: 'TerraformApply_Storage'
       displayName: 'Apply Terraform for Prod Environment Storage'
-      pool: 'Azure Pipelines'
+      pool: 'Self-Hosted'
       environment: Prod
       strategy:
         runOnce:
           deploy:
             steps:
               - checkout: self
-              - checkout: TerraformVars
 
               - task: TerraformInstaller@1
                 displayName: 'Terraform Install'
@@ -101,13 +102,13 @@ stages:
                 displayName: 'Extract Plan Artifact'
                 inputs:
                   archiveFilePatterns: '$(Pipeline.Workspace)/prod-storage-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/production/storage_account/'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/production/storage_account/'
                   cleanDestinationFolder: true
 
-              - task: TerraformCLI@0
+              - task: TerraformCLI@1
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/production/storage_account/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/production/storage_account/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false
