@@ -18,7 +18,7 @@ stages:
   jobs:
     - job: 'TerraformInitPlan_Storage'
       displayName: 'Initialize and Plan Terraform for Prod Environment Storage'
-      pool: 'Azure Pipelines'
+      pool: 'Self-Hosted'
 
       steps:
         - checkout: self
