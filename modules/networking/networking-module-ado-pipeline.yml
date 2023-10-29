@@ -48,7 +48,7 @@ stages:
             backendServiceArm: '$(backendServiceArm)'
             backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
             backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
-            backendAzureRmContainerName: 'network-module'
+            backendAzureRmContainerName: 'lab-tfstate'
             backendAzureRmKey: 'networking.terraform.tfstate'
             allowTelemetryCollection: false
 
