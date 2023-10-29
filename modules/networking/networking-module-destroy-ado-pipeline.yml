@@ -12,13 +12,13 @@ trigger:
 
 stages:
 
-- stage: 'NetworkingModule'
+- stage: 'NetworkingModuleDestroy'
   dependsOn: []
-  displayName: Networking Module
+  displayName: Networking Module Destroy
 
   jobs:
-    - job: 'TerraformInitPlan_NetworkingModule'
-      displayName: 'Initialize and Plan Terraform for Networking Module'
+    - job: 'TerraformInitPlan_NetworkingModuleDestroy'
+      displayName: 'Initialize and Plan Terraform for Networking Module Destroy' 
       pool: 'Azure Pipelines'
       
       steps:
@@ -53,11 +53,11 @@ stages:
             allowTelemetryCollection: false
 
         - task: TerraformCLI@1
-          displayName: 'Networking Module Terraform Plan'
+          displayName: 'Networking Module Terraform Plan Destroy'
           inputs:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/modules/networking/'
-            commandOptions: '-out ${BUILD_BUILDNUMBER}.tfplan'
+            commandOptions: '-destroy -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
@@ -79,13 +79,13 @@ stages:
             targetPath: '$(Build.ArtifactStagingDirectory)'
             artifactName: 'networking-module-plan'
             
-- stage: 'NetworkingModuleApply'
-  dependsOn: 'NetworkingModule'
-  displayName: Networking Module Apply
+- stage: 'NetworkingModuleApplyDestroy'
+  dependsOn: 'NetworkingModuleDestroy'
+  displayName: Networking Module Apply Destroy
   
   jobs:          
     - deployment: 'TerraformApply_Networking'
-      displayName: 'Apply Terraform for Networking Module'
+      displayName: 'Apply Terraform for Networking Module Destroy'
       pool: 'Azure Pipelines'
       environment: Lab
       strategy:
