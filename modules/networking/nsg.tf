@@ -10,7 +10,7 @@ resource "azurerm_network_security_group" "snet_nsg" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "snet_nsg_asc" {
-  subnet_id                 = azurerm_subnet.vm_subnet.id
+  subnet_id                 = azurerm_subnet.subnet.id
   network_security_group_id = azurerm_network_security_group.snet_nsg.id
-  depends_on                = [azurerm_subnet.vm_subnet]
+  depends_on                = [azurerm_subnet.subnet]
 }
