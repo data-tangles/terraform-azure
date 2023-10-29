@@ -1,12 +1,6 @@
 variables:
   - group: terraform-azure
-
-resources:
-  repositories:
-    - repository: 'TerraformVars'
-      type: github
-      endpoint: qman-being
-      name: qman-being/terraform-vars
+  - group: terraform_azure_networking_module
 
 parameters:
   - name: terraformVersion
@@ -18,43 +12,52 @@ trigger:
 
 stages:
 
-- stage: 'DevEnvironmentNetworking'
+- stage: 'NetworkingModuleDestroy'
   dependsOn: []
-  displayName: Dev Environment Networking
+  displayName: Networking Module Destroy
 
   jobs:
-    - job: 'TerraformInitPlan_Networking'
-      displayName: 'Initialize and Plan Terraform for Dev Environment Networking'
+    - job: 'TerraformInitPlan_NetworkingModuleDestroy'
+      displayName: 'Initialize and Plan Terraform for Networking Module Destroy' 
       pool: 'Azure Pipelines'
       
       steps:
         - checkout: self
-        - checkout: TerraformVars
 
-        - task: TerraformInstaller@0
+        - task: TerraformInstaller@1
           displayName: 'Terraform Install'
           inputs:
             terraformVersion: ${{ parameters.terraformVersion }}
+
+        - task: replacetokens@5
+          inputs:
+            rootDirectory: '$(System.DefaultWorkingDirectory)/modules/networking/'
+            targetFiles: '**/*.tfvars'
+            encoding: 'auto'
+            tokenPattern: 'default'
+            writeBOM: true
+            actionOnMissing: 'warn'
+            enableTelemetry: false
             
-        - task: TerraformCLI@0
-          displayName: 'Dev Networking Terraform Init'
+        - task: TerraformCLI@1
+          displayName: 'Networking Module Terraform Init'
           inputs:
             command: 'init'
             backendType: 'azurerm'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/modules/networking/'
             backendServiceArm: '$(backendServiceArm)'
             backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
             backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
-            backendAzureRmContainerName: 'dev-tfstate'
-            backendAzureRmKey: 'dev.networking.terraform.tfstate'
+            backendAzureRmContainerName: 'lab-tfstate'
+            backendAzureRmKey: 'networking.terraform.tfstate'
             allowTelemetryCollection: false
 
-        - task: TerraformCLI@0
-          displayName: 'Dev Networking Terraform Plan'
+        - task: TerraformCLI@1
+          displayName: 'Networking Module Terraform Plan Destroy'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/vnet_subnet_nsg/dev.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/modules/networking/'
+            commandOptions: '-destroy -out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
@@ -62,7 +65,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/modules/networking/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -74,25 +77,24 @@ stages:
           displayName: 'Publish Plan Artifact'
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'dev-networking-plan'
+            artifactName: 'networking-module-plan'
             
-- stage: 'DevEnvironmentNetworkingApply'
-  dependsOn: 'DevEnvironmentNetworking'
-  displayName: Dev Environment Networking Apply
+- stage: 'NetworkingModuleApplyDestroy'
+  dependsOn: 'NetworkingModuleDestroy'
+  displayName: Networking Module Apply Destroy
   
   jobs:          
     - deployment: 'TerraformApply_Networking'
-      displayName: 'Apply Terraform for Dev Environment Networking'
+      displayName: 'Apply Terraform for Networking Module Destroy'
       pool: 'Azure Pipelines'
-      environment: Dev
+      environment: Lab
       strategy:
         runOnce:
           deploy:
             steps:
               - checkout: self
-              - checkout: TerraformVars
 
-              - task: TerraformInstaller@0
+              - task: TerraformInstaller@1
                 displayName: 'Terraform Install'
                 inputs:
                   terraformVersion: ${{ parameters.terraformVersion }}
@@ -100,14 +102,14 @@ stages:
               - task: ExtractFiles@1
                 displayName: 'Extract Plan Artifact'
                 inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/dev-networking-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+                  archiveFilePatterns: '$(Pipeline.Workspace)/networking-module-plan/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/modules/networking/'
                   cleanDestinationFolder: true
 
-              - task: TerraformCLI@0
+              - task: TerraformCLI@1
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/modules/networking/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false
