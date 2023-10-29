@@ -1,12 +1,6 @@
 variables:
   - group: terraform-azure
-
-resources:
-  repositories:
-    - repository: 'TerraformVars'
-      type: github
-      endpoint: qman-being
-      name: qman-being/terraform-vars
+  - group: terraform_azure_networking_module
 
 parameters:
   - name: terraformVersion
@@ -18,43 +12,52 @@ trigger:
 
 stages:
 
-- stage: 'ProdEnvironmentNetworking'
+- stage: 'NetworkingModule'
   dependsOn: []
-  displayName: Prod Environment Networking
+  displayName: Networking Module
 
   jobs:
-    - job: 'TerraformInitPlan_Networking'
-      displayName: 'Initialize and Plan Terraform for Prod Environment Networking'
+    - job: 'TerraformInitPlan_NetworkingModule'
+      displayName: 'Initialize and Plan Terraform for Networking Module'
       pool: 'Azure Pipelines'
       
       steps:
         - checkout: self
-        - checkout: TerraformVars
 
         - task: TerraformInstaller@0
           displayName: 'Terraform Install'
           inputs:
             terraformVersion: ${{ parameters.terraformVersion }}
+
+        - task: replacetokens@5
+          inputs:
+            rootDirectory: '$(System.DefaultWorkingDirectory)/modules/networking/'
+            targetFiles: '**/*.tfvars'
+            encoding: 'auto'
+            tokenPattern: 'default'
+            writeBOM: true
+            actionOnMissing: 'warn'
+            enableTelemetry: false
             
         - task: TerraformCLI@0
-          displayName: 'Prod Networking Terraform Init'
+          displayName: 'Networking Module Terraform Init'
           inputs:
             command: 'init'
             backendType: 'azurerm'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/modules/networking/'
             backendServiceArm: '$(backendServiceArm)'
             backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
             backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
-            backendAzureRmContainerName: 'prod-tfstate'
-            backendAzureRmKey: 'prod.networking.terraform.tfstate'
+            backendAzureRmContainerName: 'network-module'
+            backendAzureRmKey: 'networking.terraform.tfstate'
             allowTelemetryCollection: false
 
         - task: TerraformCLI@0
-          displayName: 'Prod Networking Terraform Plan'
+          displayName: 'Networking Module Terraform Plan'
           inputs:
             command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
-            commandOptions: '-var-file="$(System.DefaultWorkingDirectory)/terraform-vars/variables/terraform-azure/vnet_subnet_nsg/prod.tfvars" -out ${BUILD_BUILDNUMBER}.tfplan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/modules/networking/'
+            commandOptions: '-out ${BUILD_BUILDNUMBER}.tfplan'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
@@ -62,7 +65,7 @@ stages:
           condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
           displayName: 'Create Plan Artifact'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/modules/networking/'
             includeRootFolder: false
             archiveType: 'tar'
             tarCompression: 'gz'
@@ -74,23 +77,22 @@ stages:
           displayName: 'Publish Plan Artifact'
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'prod-networking-plan'
+            artifactName: 'networking-module-plan'
             
-- stage: 'ProdEnvironmentNetworkingApply'
-  dependsOn: 'ProdEnvironmentNetworking'
-  displayName: Prod Environment Networking Apply
+- stage: 'NetworkingModuleApply'
+  dependsOn: 'NetworkingModule'
+  displayName: Networking Module Apply
   
   jobs:          
     - deployment: 'TerraformApply_Networking'
-      displayName: 'Apply Terraform for Prod Environment Networking'
+      displayName: 'Apply Terraform for Networking Module'
       pool: 'Azure Pipelines'
-      environment: Prod
+      environment: Dev
       strategy:
         runOnce:
           deploy:
             steps:
               - checkout: self
-              - checkout: TerraformVars
 
               - task: TerraformInstaller@0
                 displayName: 'Terraform Install'
@@ -100,14 +102,14 @@ stages:
               - task: ExtractFiles@1
                 displayName: 'Extract Plan Artifact'
                 inputs:
-                  archiveFilePatterns: '$(Pipeline.Workspace)/Prod-networking-plan/$(Build.BuildNumber).tgz'
-                  destinationFolder: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+                  archiveFilePatterns: '$(Pipeline.Workspace)/networking-module-plan/$(Build.BuildNumber).tgz'
+                  destinationFolder: '$(System.DefaultWorkingDirectory)/modules/networking/'
                   cleanDestinationFolder: true
 
               - task: TerraformCLI@0
                 inputs:
                   command: 'apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-azure/modules/01_vnet_subnet_nsg/'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/modules/networking/'
                   commandOptions: '${BUILD_BUILDNUMBER}.tfplan'
                   environmentServiceName: '$(backendServiceArm)'
                   allowTelemetryCollection: false
