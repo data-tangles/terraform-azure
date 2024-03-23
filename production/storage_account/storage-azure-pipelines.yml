@@ -64,8 +64,6 @@ stages:
           name: 'terraformChanges'
           inputs:
             script: |
-              terraform plan -input=false -no-color -out ${BUILD_BUILDNUMBER}.tfplan -detailed-exitcode
-
               if [ "$TERRAFORM_PLAN_HAS_CHANGES" = true  ]; then
                 echo "##vso[task.setvariable variable=planChanged;isOutput=true]true"
               else
