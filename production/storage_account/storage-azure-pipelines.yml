@@ -56,7 +56,7 @@ stages:
           inputs:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/production/storage_account/'
-            commandOptions: '-out ${BUILD_BUILDNUMBER}.tfplan'
+            commandOptions: '-out ${BUILD_BUILDNUMBER}.tfplan -detailed-exitcode'
             environmentServiceName: '$(backendServiceArm)'
             allowTelemetryCollection: false
 
