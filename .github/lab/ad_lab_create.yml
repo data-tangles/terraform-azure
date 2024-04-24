@@ -1,0 +1,93 @@
+name: AD Lab Create CI
+
+on:
+  workflow_dispatch: 
+    
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+jobs:
+  init_and_plan:
+    name: Terraform Init and Plan
+    runs-on: ubuntu-latest
+    environment: Azure
+
+    outputs:
+      planChangedOutput: ${{ steps.terraformPlan.outputs.planChanged }}
+
+    steps:
+
+      - name: Checkout 🔔
+        uses: actions/checkout@v4
+
+      - name: Azure Login with OIDC 🔑
+        uses: azure/login@v2.1.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Map Secrets to Environment Variables 🗺️ 
+        uses: oNaiPs/secrets-to-env-action@v1.5
+        with:
+            secrets: ${{ toJSON(secrets) }}        
+
+      - name: Replace Tokens 🪙
+        uses: cschleiden/replace-tokens@v1.3
+        with:
+          files: '["./labs/ad_lab/*.*"]'
+
+      - name: Install Terraform ⛰️
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init 🏃
+        id: terraformInit
+        run: terraform init
+        working-directory: ./labs/ad_lab
+
+      - name: Terraform Plan 🗺️
+        id: terraformPlan
+        run: |
+          terraform plan -input=false -no-color -out ${{ github.run_number }}.tfplan -detailed-exitcode
+
+          if [ $? -eq 2 ]; then
+            echo "planChanged=true" >> $GITHUB_OUTPUT
+          else
+            echo "planChanged=false" >> $GITHUB_OUTPUT
+          fi 
+        working-directory: ./labs/ad_lab
+
+      - name: Cache Terraform Plan 📦
+        uses: actions/cache/save@v4.0.2
+        with:
+          path: ./labs/ad_lab/${{ github.run_number }}.tfplan
+          key: ${{ github.run_number }}
+
+  apply:
+    name: Terraform Apply
+    needs:
+      - init_and_plan
+    if: needs.init_and_plan.outputs.planChangedOutput == 'true'
+    runs-on: ubuntu-latest
+    environment: "Manual Approval"
+
+    steps:
+
+      - name: Checkout 🔔
+        uses: actions/checkout@v4
+
+      - name: Restore Terraform Plan 🗺️
+        uses: actions/cache/restore@v4.0.2
+        with:
+          path: ./labs/ad_lab/${{ github.run_number }}.tfplan
+          key: ${{ github.run_number }}
+
+      - name: Install Terraform ⛰️
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Apply 🚀
+        run: terraform apply ${{ github.run_number }}.tfplan
+        working-directory: ./labs/ad_lab
+
