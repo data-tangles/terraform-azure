@@ -8,6 +8,3 @@ account_tier = "#{ACCOUNT_TIER}#"
 access_tier = "#{ACCESS_TIER}#"
 account_replication_type = "#{ACCOUNT_REPLICATION_TYPE}#"
 allowed_sa_ips = ["#{ALLOWED_SA_IPS}#"]
-fs_name = "#{FS_NAME}#"
-fs_quota = "#{FS_QUOTA}#"
-fs_access_tier = "#{FS_ACCESS_TIER}#"
