@@ -5,17 +5,16 @@ on:
     
 permissions:
   contents: write
-  packages: write
+  issues: write
   id-token: write
 
 jobs:
   init_and_plan:
     name: Terraform Init and Plan
     runs-on: ubuntu-latest
-    environment: Azure
 
     outputs:
-      planChangedOutput: ${{ steps.terraformPlan.outputs.planChanged }}
+      planChanged: ${{ steps.terraformPlan.outputs.planChanged }}
 
     steps:
 
@@ -69,11 +68,20 @@ jobs:
     name: Terraform Apply
     needs:
       - init_and_plan
-    if: needs.init_and_plan.outputs.planChangedOutput == 'true'
+    if: needs.init_and_plan.outputs.planChanged == 'true'
     runs-on: ubuntu-latest
-    environment: "Manual Approval"
 
     steps:
+
+      - name: Manual Approval 🚦
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: data-tangles
+          minimum-approvals: 1
+          issue-title: "Terraform Apply"
+          issue-body: "Please approve or deny the Terraform Apply operation"
+          exclude-workflow-initiator-as-approver: false
 
       - name: Checkout 🔔
         uses: actions/checkout@v4
