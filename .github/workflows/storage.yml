@@ -1,7 +1,10 @@
 name: Production Storage CI
 
 on:
-  workflow_dispatch: 
+  push:
+    branches:
+      - "main"
+  pull_request:
     
 permissions:
   contents: write
@@ -55,14 +58,16 @@ jobs:
       - name: Cache Terraform Plan 📦
         uses: actions/cache/save@v4.0.2
         with:
-          path: ./production/storage_account/${{ github.run_number }}.tfplan
+          path: |
+           ./production/storage_account/${{ github.run_number }}.tfplan
+           ./production/storage_account/.terraform.lock.hcl
           key: ${{ github.run_number }}
 
   apply:
     name: Terraform Apply
     needs:
       - init_and_plan
-    if: needs.init_and_plan.outputs.planExitcode == 2
+    if: github.event_name != 'pull_request' && needs.init_and_plan.outputs.planExitcode == 2
     runs-on: ubuntu-latest
 
     steps:
@@ -83,7 +88,9 @@ jobs:
       - name: Restore Terraform Plan 🗺️
         uses: actions/cache/restore@v4.0.2
         with:
-          path: ./production/storage_account/${{ github.run_number }}.tfplan
+          path: |
+           ./production/storage_account/${{ github.run_number }}.tfplan
+           ./production/storage_account/.terraform.lock.hcl
           key: ${{ github.run_number }}
 
       - name: Install Terraform ⛰️

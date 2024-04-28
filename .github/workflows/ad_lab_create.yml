@@ -55,7 +55,9 @@ jobs:
       - name: Cache Terraform Plan 📦
         uses: actions/cache/save@v4.0.2
         with:
-          path: ./labs/ad_lab/${{ github.run_number }}.tfplan
+          path: |
+           ./labs/ad_lab/${{ github.run_number }}.tfplan
+           ./labs/ad_lab/.terraform.lock.hcl
           key: ${{ github.run_number }}
 
   apply:
@@ -83,7 +85,9 @@ jobs:
       - name: Restore Terraform Plan 🗺️
         uses: actions/cache/restore@v4.0.2
         with:
-          path: ./labs/ad_lab/${{ github.run_number }}.tfplan
+          path: |
+           ./labs/ad_lab/${{ github.run_number }}.tfplan
+           ./labs/ad_lab/.terraform.lock.hcl
           key: ${{ github.run_number }}
 
       - name: Install Terraform ⛰️
