@@ -49,14 +49,14 @@ jobs:
       - name: Terraform Plan 🗺️
         id: terraformPlan
         run: |
-          terraform plan -input=false -no-color -destroy -out ${{ github.run_number }}.tfplan -detailed-exitcode
+          terraform plan -input=false -no-color -destroy -out ${{ github.sha }}.tfplan -detailed-exitcode
         working-directory: ./labs/ad_lab
 
       - name: Cache Terraform Plan 📦
         uses: actions/cache/save@v4.0.2
         with:
           path: ./labs/ad_lab/**
-          key: ${{ github.run_number }}
+          key: ${{ github.sha }}
 
   apply:
     name: Terraform Apply
@@ -80,16 +80,23 @@ jobs:
       - name: Checkout 🔔
         uses: actions/checkout@v4
 
+      - name: Azure Login with OIDC 🔑
+        uses: azure/login@v2.1.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Restore Terraform Plan 🗺️
         uses: actions/cache/restore@v4.0.2
         with:
           path: ./labs/ad_lab/**
-          key: ${{ github.run_number }}
+          key: ${{ github.sha }}
 
       - name: Install Terraform ⛰️
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Apply 🚀
-        run: terraform apply ${{ github.run_number }}.tfplan
+        run: terraform apply ${{ github.sha }}.tfplan -auto-approve
         working-directory: ./labs/ad_lab
 
