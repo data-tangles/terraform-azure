@@ -58,9 +58,7 @@ jobs:
       - name: Cache Terraform Plan 📦
         uses: actions/cache/save@v4.0.2
         with:
-          path: |
-           ./production/storage_account/${{ github.run_number }}.tfplan
-           ./production/storage_account/.terraform.lock.hcl
+          path: ./production/storage_account/**
           key: ${{ github.run_number }}
 
   apply:
@@ -88,9 +86,7 @@ jobs:
       - name: Restore Terraform Plan 🗺️
         uses: actions/cache/restore@v4.0.2
         with:
-          path: |
-           ./production/storage_account/${{ github.run_number }}.tfplan
-           ./production/storage_account/.terraform.lock.hcl
+          path: ./production/storage_account/**
           key: ${{ github.run_number }}
 
       - name: Install Terraform ⛰️
