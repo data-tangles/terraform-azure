@@ -97,6 +97,6 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Apply 🚀
-        run: terraform apply ${{ github.sha }}.tfplan -auto-approve
+        run: terraform apply ${{ github.sha }}.tfplan
         working-directory: ./labs/ad_lab
 
