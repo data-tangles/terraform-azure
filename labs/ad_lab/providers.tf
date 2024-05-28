@@ -5,7 +5,7 @@ terraform {
       version = "3.104.0"
     }
     random = {
-      version = "3.6.1"
+      version = "3.6.2"
     }
   }
   backend "azurerm" {}
