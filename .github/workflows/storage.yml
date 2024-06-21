@@ -23,27 +23,27 @@ jobs:
     steps:
 
       - name: Checkout 🔔
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
       - name: Azure Login with OIDC 🔑
-        uses: azure/login@v2.1.1
+        uses: azure/login@6c251865b4e6290e7b78be643ea2d005bc51f69a # v2.1.1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Map Secrets to Environment Variables 🗺️ 
-        uses: oNaiPs/secrets-to-env-action@v1.5
+        uses: oNaiPs/secrets-to-env-action@ec46a22bfc9b37e014b627b3208b07eb8909ea0f # v1.5
         with:
             secrets: ${{ toJSON(secrets) }}        
 
       - name: Replace Tokens 🪙
-        uses: cschleiden/replace-tokens@v1.3
+        uses: cschleiden/replace-tokens@4d5a042c84c3568b3858b7af9394923d2d5195c9 # v1.3
         with:
           files: '["./production/storage_account/*.*"]'
 
       - name: Install Terraform ⛰️
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@651471c36a6092792c552e8b1bef71e592b462d8 # v3
 
       - name: Terraform Init 🏃
         id: terraformInit
@@ -57,7 +57,7 @@ jobs:
         working-directory: ./production/storage_account
 
       - name: Cache Terraform Plan 📦
-        uses: actions/cache/save@v4.0.2
+        uses: actions/cache/save@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
         with:
           path: ./production/storage_account/**
           key: ${{ github.sha }}
@@ -72,7 +72,7 @@ jobs:
     steps:
 
       - name: Manual Approval 🚦
-        uses: trstringer/manual-approval@v1
+        uses: trstringer/manual-approval@662b3ddbc7685f897992051e87e1b4b58c07dc03 # v1
         with:
           secret: ${{ github.TOKEN }}
           approvers: data-tangles
@@ -82,23 +82,23 @@ jobs:
           exclude-workflow-initiator-as-approver: false
 
       - name: Checkout 🔔
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
       - name: Azure Login with OIDC 🔑
-        uses: azure/login@v2.1.1
+        uses: azure/login@6c251865b4e6290e7b78be643ea2d005bc51f69a # v2.1.1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Restore Terraform Plan 🗺️
-        uses: actions/cache/restore@v4.0.2
+        uses: actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
         with:
           path: ./production/storage_account/**
           key: ${{ github.sha }}
 
       - name: Install Terraform ⛰️
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@651471c36a6092792c552e8b1bef71e592b462d8 # v3
 
       - name: Terraform Apply 🚀
         run: terraform apply ${{ github.sha }}.tfplan
