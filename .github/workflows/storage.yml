@@ -5,6 +5,8 @@ on:
     branches:
       - "main"
   pull_request:
+    paths:
+      - 'production/storage_account'
   workflow_dispatch:
     
 permissions:
