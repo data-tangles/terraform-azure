@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - "main"
+    paths:
+      - 'production/storage_account'
   pull_request:
     paths:
       - 'production/storage_account'
