@@ -1,13 +1,7 @@
-name: Production Storage CI
+name: Azure App Services Create
 
 on:
-  push:
-    branches:
-      - "main"
-  pull_request:
-    paths:
-      - 'production/storage_account'
-  workflow_dispatch:
+  workflow_dispatch: 
     
 permissions:
   contents: write
@@ -42,7 +36,7 @@ jobs:
       - name: Replace Tokens 🪙
         uses: cschleiden/replace-tokens@4d5a042c84c3568b3858b7af9394923d2d5195c9 # v1.3
         with:
-          files: '["./production/storage_account/*.*"]'
+          files: '["./modules/azure_app_service/*.*"]'
 
       - name: Install Terraform ⛰️
         uses: hashicorp/setup-terraform@651471c36a6092792c552e8b1bef71e592b462d8 # v3
@@ -50,25 +44,25 @@ jobs:
       - name: Terraform Init 🏃
         id: terraformInit
         run: terraform init
-        working-directory: ./production/storage_account
+        working-directory: ./modules/azure_app_service
 
       - name: Terraform Plan 🗺️
         id: terraformPlan
         run: |
           terraform plan -input=false -no-color -out ${{ github.sha }}.tfplan -detailed-exitcode
-        working-directory: ./production/storage_account
+        working-directory: ./modules/azure_app_service
 
       - name: Cache Terraform Plan 📦
         uses: actions/cache/save@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
         with:
-          path: ./production/storage_account/**
-          key: ${{ github.sha }}
+          path: ./modules/azure_app_service/**
+          key: ${{ github.sha }}  
 
   apply:
     name: Terraform Apply
     needs:
       - init_and_plan
-    if: github.event_name != 'pull_request' && needs.init_and_plan.outputs.planExitcode == 2
+    if: needs.init_and_plan.outputs.planExitcode == 2
     runs-on: ubuntu-latest
 
     steps:
@@ -96,7 +90,7 @@ jobs:
       - name: Restore Terraform Plan 🗺️
         uses: actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
         with:
-          path: ./production/storage_account/**
+          path: ./modules/azure_app_service/**
           key: ${{ github.sha }}
 
       - name: Install Terraform ⛰️
@@ -104,5 +98,5 @@ jobs:
 
       - name: Terraform Apply 🚀
         run: terraform apply ${{ github.sha }}.tfplan
-        working-directory: ./production/storage_account
+        working-directory: ./modules/azure_app_service
 
