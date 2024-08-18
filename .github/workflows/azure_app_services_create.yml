@@ -12,6 +12,7 @@ jobs:
   init_and_plan:
     name: Terraform Init and Plan
     runs-on: ubuntu-latest
+    environment: 'Azure App Service'
 
     outputs:
       planExitcode: ${{ steps.terraformPlan.outputs.exitcode }}
@@ -64,6 +65,7 @@ jobs:
       - init_and_plan
     if: needs.init_and_plan.outputs.planExitcode == 2
     runs-on: ubuntu-latest
+    environment: 'Azure App Service'
 
     steps:
 
