@@ -21,6 +21,7 @@ resource "azurerm_linux_web_app" "web_app" {
   tags                = merge(local.common_tags)
 
   site_config {
+    always_on = false
     ip_restriction {
       ip_address = var.allowed_ip_address
     }
