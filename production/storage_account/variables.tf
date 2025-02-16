@@ -16,16 +16,19 @@ variable "container_name" {
 
 variable "tenant_id" {
   type        = string
+  sensitive   = true
   description = "Azure Tenant ID"
 }
 
 variable "subscription_id" {
   type        = string
+  sensitive   = true
   description = "Azure Subscription ID"
 }
 
 variable "client_id" {
   type        = string
+  sensitive   = true
   description = "Azure Client ID"
 }
 
@@ -78,5 +81,6 @@ variable "account_replication_type" {
 
 variable "allowed_sa_ips" {
   type        = list(string)
+  sensitive   = true
   description = "Allowed Public IP's"
 }

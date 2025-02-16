@@ -22,7 +22,10 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SOPS_VERSION: 3.9.4
+      TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+      TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+      TF_VAR_allowed_sa_ips: ${{ secrets.ALLOWED_SA_IPS }}
 
     outputs:
       planExitcode: ${{ steps.terraformPlan.outputs.exitcode }}
@@ -31,14 +34,6 @@ jobs:
 
       - name: Checkout 🔔
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-
-      - name: Decrypt SOPS encrypted variables 🪙
-        run: |
-          curl -LO https://github.com/getsops/sops/releases/download/v${{ env.SOPS_VERSION }}/sops-v${{ env.SOPS_VERSION }}.linux.amd64
-          sudo mv sops-v${{ env.SOPS_VERSION }}.linux.amd64 /usr/local/bin/sops
-          chmod +x /usr/local/bin/sops
-          export SOPS_AGE_KEY=${{ secrets.SOPS_AGE_KEY }}
-          sops --decrypt ./production/storage_account/terraform.sops.tfvars > ./production/storage_account/terraform.tfvars
 
       - name: Azure Login with OIDC 🔑
         uses: azure/login@a65d910e8af852a8061c627c456678983e180302 # v2.2.0
