@@ -45,5 +45,6 @@ variable "account_replication_type" {
 
 variable "allowed_sa_ips" {
   type        = list(string)
+  sensitive   = true
   description = "Allowed Public IP's"
 }
