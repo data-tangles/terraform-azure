@@ -6,12 +6,12 @@ terraform {
     }
   }
   backend "azurerm" {
-    resource_group_name   = "#{AZURERM_RESOURCE_GROUP_NAME}#"
-    storage_account_name  = "#{AZURERM_STORAGE_ACCOUNT_NAME}#"
-    container_name        = "#{AZURERM_CONTAINER_NAME}#"
-    tenant_id             = "#{AZURE_TENANT_ID}#"
-    subscription_id       = "#{AZURE_SUBSCRIPTION_ID}#"
-    client_id             = "#{AZURE_CLIENT_ID}#"
+    resource_group_name   = var.resource_group_name
+    storage_account_name  = var.storage_account_name
+    container_name        = var.container_name
+    tenant_id             = var.tenant_id
+    subscription_id       = var.subscription_id
+    client_id             = var.client_id
     key                   = "prod.storage.terraform.tfstate"
     use_oidc              = true
   }
