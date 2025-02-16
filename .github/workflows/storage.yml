@@ -16,16 +16,16 @@ permissions:
   issues: write
   id-token: write
 
+env:
+  ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
+  ARM_SUBSCRIPTION_ID: "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+  ARM_TENANT_ID: "${{ secrets.AZURE_TENANT_ID }}"
+  TF_VAR_allowed_sa_ips: "${{ secrets.ALLOWED_SA_IPS }}"
+
 jobs:
   init_and_plan:
     name: Terraform Init and Plan
     runs-on: ubuntu-latest
-
-    env:
-      TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-      TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      TF_VAR_client_id: ${{ secrets.AZURE_CLIENT_ID }}
-      TF_VAR_allowed_sa_ips: ${{ secrets.ALLOWED_SA_IPS }}
 
     outputs:
       planExitcode: ${{ steps.terraformPlan.outputs.exitcode }}
@@ -38,9 +38,9 @@ jobs:
       - name: Azure Login with OIDC 🔑
         uses: azure/login@a65d910e8af852a8061c627c456678983e180302 # v2.2.0
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}      
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}      
 
       - name: Install Terraform ⛰️
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
@@ -87,9 +87,9 @@ jobs:
       - name: Azure Login with OIDC 🔑
         uses: azure/login@a65d910e8af852a8061c627c456678983e180302 # v2.2.0
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }} 
 
       - name: Restore Terraform Plan 🗺️
         uses: actions/cache/restore@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0

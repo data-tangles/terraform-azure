@@ -6,12 +6,9 @@ terraform {
     }
   }
   backend "azurerm" {
-    resource_group_name   = var.resource_group_name
-    storage_account_name  = var.storage_account_name
-    container_name        = var.container_name
-    tenant_id             = var.tenant_id
-    subscription_id       = var.subscription_id
-    client_id             = var.client_id
+    resource_group_name   = "rg-storage-tf-san-01"
+    storage_account_name  = "sttfssan01"
+    container_name        = "prod-tfstate"
     key                   = "prod.storage.terraform.tfstate"
     use_oidc              = true
   }
