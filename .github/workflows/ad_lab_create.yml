@@ -13,6 +13,9 @@ jobs:
     name: Terraform Init and Plan
     runs-on: ubuntu-latest
 
+    env:
+      SOPS_VERSION: 3.9.4
+
     outputs:
       planExitcode: ${{ steps.terraformPlan.outputs.exitcode }}
 
@@ -28,15 +31,13 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Map Secrets to Environment Variables 🗺️ 
-        uses: oNaiPs/secrets-to-env-action@ec46a22bfc9b37e014b627b3208b07eb8909ea0f # v1.5
-        with:
-            secrets: ${{ toJSON(secrets) }}        
-
-      - name: Replace Tokens 🪙
-        uses: cschleiden/replace-tokens@4d5a042c84c3568b3858b7af9394923d2d5195c9 # v1.3
-        with:
-          files: '["./labs/ad_lab/*.*"]'
+      - name: Decrypt SOPS encrypted variables 🪙
+        run: |
+          curl -LO https://github.com/getsops/sops/releases/download/v${{ env.SOPS_VERSION }}/sops-v${{ env.SOPS_VERSION }}.linux.amd64
+          sudo mv sops-v${{ env.SOPS_VERSION }}.linux.amd64 /usr/local/bin/sops
+          chmod +x /usr/local/bin/sops
+          export SOPS_AGE_KEY=${{ secrets.SOPS_AGE_KEY }}
+          sops --decrypt ./labs/ad_lab/terraform.sops.tfvars > ./labs/ad_lab/terraform.tfvars
 
       - name: Install Terraform ⛰️
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
@@ -49,14 +50,14 @@ jobs:
       - name: Terraform Plan 🗺️
         id: terraformPlan
         run: |
-          terraform plan -input=false -no-color -out ${{ github.sha }}.tfplan -detailed-exitcode
+          terraform plan -input=false -no-color -out ${{ github.run_id }}.tfplan -detailed-exitcode
         working-directory: ./labs/ad_lab
 
       - name: Cache Terraform Plan 📦
         uses: actions/cache/save@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
           path: ./labs/ad_lab/**
-          key: ${{ github.sha }}  
+          key: ${{ github.run_id }}  
 
   apply:
     name: Terraform Apply
@@ -73,7 +74,7 @@ jobs:
           secret: ${{ github.TOKEN }}
           approvers: data-tangles
           minimum-approvals: 1
-          issue-title: "Terraform Apply"
+          issue-title: "Terraform Apply - ${{ github.workflow }}"
           issue-body: "Please approve or deny the Terraform Apply operation"
           exclude-workflow-initiator-as-approver: false
 
@@ -91,12 +92,12 @@ jobs:
         uses: actions/cache/restore@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
           path: ./labs/ad_lab/**
-          key: ${{ github.sha }}
+          key: ${{ github.run_id }}
 
       - name: Install Terraform ⛰️
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
 
       - name: Terraform Apply 🚀
-        run: terraform apply ${{ github.sha }}.tfplan
+        run: terraform apply ${{ github.run_id }}.tfplan
         working-directory: ./labs/ad_lab
 
