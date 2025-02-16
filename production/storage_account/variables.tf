@@ -1,3 +1,36 @@
+# Provider
+variable "resource_group_name" {
+  type        = string
+  description = "Name of the Resource Group"
+}
+
+variable "storage_account_name" {
+  type        = string
+  description = "Name of the Storage Account"
+}
+
+variable "container_name" {
+  type        = string
+  description = "Name of the Storage Container"
+}
+
+variable "tenant_id" {
+  type        = string
+  description = "Azure Tenant ID"
+}
+
+variable "subscription_id" {
+  type        = string
+  description = "Azure Subscription ID"
+}
+
+variable "client_id" {
+  type        = string
+  description = "Azure Client ID"
+}
+
+# Resources 
+
 variable "tag_environment" {
   type        = string
   description = "Tag Value for Environment"
