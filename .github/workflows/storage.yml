@@ -67,7 +67,7 @@ jobs:
         working-directory: ./production/storage_account
 
       - name: Cache Terraform Plan 📦
-        uses: actions/cache/save@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+        uses: actions/cache/save@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
         with:
           path: ./production/storage_account/**
           key: ${{ github.run_id }}
@@ -102,7 +102,7 @@ jobs:
           subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }} 
 
       - name: Restore Terraform Plan 🗺️
-        uses: actions/cache/restore@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+        uses: actions/cache/restore@0c907a75c2c80ebcb7f088228285e798b750cf8f # v4.2.1
         with:
           path: ./production/storage_account/**
           key: ${{ github.run_id }}
