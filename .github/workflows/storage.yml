@@ -53,7 +53,7 @@ jobs:
           subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}      
 
       - name: Install Terraform ⛰️
-        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
 
       - name: Terraform Init 🏃
         id: terraformInit
@@ -108,7 +108,7 @@ jobs:
           key: ${{ github.run_id }}
 
       - name: Install Terraform ⛰️
-        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
 
       - name: Terraform Apply 🚀
         run: terraform apply ${{ github.run_id }}.tfplan
