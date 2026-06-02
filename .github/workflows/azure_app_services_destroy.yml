@@ -22,7 +22,7 @@ jobs:
     steps:
 
       - name: Checkout 🔔
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Azure Login with OIDC 🔑
         uses: azure/login@a65d910e8af852a8061c627c456678983e180302 # v2.2.0
@@ -79,7 +79,7 @@ jobs:
           exclude-workflow-initiator-as-approver: false
 
       - name: Checkout 🔔
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Azure Login with OIDC 🔑
         uses: azure/login@a65d910e8af852a8061c627c456678983e180302 # v2.2.0
